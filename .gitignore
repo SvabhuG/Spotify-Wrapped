@@ -1,0 +1,7 @@
+.idea
+.DS_Store
+spotify_wrapped/__pycache__/
+wrapped/__pycache__/
+wrapped/migrations/__pycache__/
+templates/.DS_Store
+db.sqlite3
