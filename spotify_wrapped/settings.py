@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,11 +21,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure--aj1d@8=5x143cx+8gva=k!q*jz!hy*tspe0u0+bcamoh(c!nx"
+load_dotenv()
+# Security Key
+SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Spotify API Credentials
+SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+
+# Debug mode
+DEBUG = os.getenv("DEBUG", "False") == "True"
+
+
+
 
 ALLOWED_HOSTS = []
 

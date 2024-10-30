@@ -5,3 +5,4 @@ wrapped/__pycache__/
 wrapped/migrations/__pycache__/
 templates/.DS_Store
 db.sqlite3
+.env
