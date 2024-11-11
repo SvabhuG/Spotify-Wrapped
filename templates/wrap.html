@@ -1,18 +1,73 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<h1>Your Spotify Wrapped</h1>
-<h2>Top Artists</h2>
-<ul>
-    {% for artist in wrap_data.top_artists %}
-        <li>{{ artist.name }}</li>
-    {% endfor %}
-</ul>
+{% block title %}Your Spotify Wrapped{% endblock %}
 
-<h2>Top Tracks</h2>
-<ul>
-    {% for track in wrap_data.top_tracks %}
-        <li>{{ track.name }} by {{ track.artist }}</li>
-    {% endfor %}
-</ul>
+{% block content %}
+<div class="slider-container">
+    <div class="slide" style="opacity: 1;">
+        <h2>Your Top Tracks</h2>
+        <ul>
+            {% for track in wrap_data.top_tracks %}
+                <li>{{ track.name }} by {{ track.artist }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="slide">
+        <h2>Your Top Artists</h2>
+        <ul>
+            {% for artist in wrap_data.top_artists %}
+                <li>{{ artist.name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="slide">
+        <h2>Your Top Genres</h2>
+        <ul>
+            {% for genre in wrap_data.top_genres %}
+                <li>{{ genre }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="slide">
+        <h2>Recently Played Tracks</h2>
+        <ul>
+            {% for item in wrap_data.recently_played %}
+                <li>{{ item.track }} by {{ item.artist }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Navigation Buttons -->
+<div class="navigation">
+    <button id="prev-slide" class="nav-button">Previous</button>
+    <button id="next-slide" class="nav-button">Next</button>
+</div>
 {% endblock %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.style.opacity = i === index ? '1' : '0';
+            slide.style.position = i === index ? 'relative' : 'absolute';
+        });
+    }
+
+    document.getElementById('next-slide').addEventListener('click', function () {
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
+    });
+
+    document.getElementById('prev-slide').addEventListener('click', function () {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        showSlide(currentSlide);
+    });
+
+    // Initial display
+    showSlide(currentSlide);
+});
+</script>

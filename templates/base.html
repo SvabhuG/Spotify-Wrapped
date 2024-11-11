@@ -1,9 +1,12 @@
+{% load static %}  <!-- Load static to use static tags -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}My Spotify Wrap{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">  <!-- Reference to external CSS file -->
     <style>
         /* Global Styles */
         body {
@@ -63,9 +66,14 @@
         <h1 class="header-title">My Spotify Wrap</h1>
         <nav>
             <a href="/">Home</a>
-            <a href="{% url 'account_login' %}">Login</a>
-            <a href="{% url 'account_signup' %}">Sign Up</a>
-            <a href="{% url 'account_logout' %}">Logout</a>
+            {% if user.is_authenticated %}
+                <!-- Show only Logout if the user is logged in -->
+                <a href="{% url 'account_logout' %}">Logout</a>
+            {% else %}
+                <!-- Show Login and Sign Up if the user is not logged in -->
+                <a href="{% url 'account_login' %}">Login</a>
+                <a href="{% url 'account_signup' %}">Sign Up</a>
+            {% endif %}
         </nav>
     </header>
 

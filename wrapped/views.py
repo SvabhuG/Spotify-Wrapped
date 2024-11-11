@@ -13,8 +13,9 @@ sp_oauth = SpotifyOAuth(
     client_id=settings.SPOTIFY_CLIENT_ID,
     client_secret=settings.SPOTIFY_CLIENT_SECRET,
     redirect_uri=settings.SPOTIFY_REDIRECT_URI,
-    scope="user-top-read"
+    scope="user-top-read user-read-recently-played user-library-read"  # Updated scope
 )
+
 
 @login_required
 def spotify_connect(request):
@@ -52,13 +53,19 @@ def generate_wrap(request):
     profile = SpotifyProfile.objects.get(user=request.user)
     sp = Spotify(auth=profile.access_token)
 
-    # Fetch top tracks and artists
+    # Fetch detailed data
     top_tracks = sp.current_user_top_tracks(limit=10, time_range="long_term")['items']
     top_artists = sp.current_user_top_artists(limit=5, time_range="long_term")['items']
+    top_genres = list(set(genre for artist in top_artists for genre in artist['genres']))
+    recently_played = sp.current_user_recently_played(limit=10)['items']
 
+    # Create wrap data for display
     wrap_data = {
         "top_tracks": [{"name": track['name'], "artist": track['artists'][0]['name']} for track in top_tracks],
-        "top_artists": [{"name": artist['name']} for artist in top_artists]
+        "top_artists": [{"name": artist['name']} for artist in top_artists],
+        "top_genres": top_genres,
+        "recently_played": [{"track": item['track']['name'], "artist": item['track']['artists'][0]['name']} for item in
+                            recently_played]
     }
 
     # Save the wrap in the database
@@ -66,6 +73,7 @@ def generate_wrap(request):
     wrap.save()
 
     return render(request, 'wrap.html', {'wrap_data': wrap_data})
+
 
 @login_required
 def wrap_history(request):
