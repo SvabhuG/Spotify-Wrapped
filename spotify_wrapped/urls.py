@@ -16,8 +16,12 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from wrapped import views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('account/', include('allauth.urls')),  # For user authentication
+    path('wraps/connect/', views.spotify_connect, name='spotify_connect'),
+    path('wraps/callback/', views.spotify_callback, name='spotify_callback'),
+    path('wraps/generate/', views.generate_wrap, name='generate_wrap'),
 ]

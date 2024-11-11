@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Your Spotify Wrap History</h1>
+<ul>
+    {% for wrap in wraps %}
+        <li>
+            <h2>Wrap from {{ wrap.created_at }}</h2>
+            <pre>{{ wrap.data|json_script:"wrap" }}</pre>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -28,14 +28,18 @@ SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
 # Spotify API Credentials
 SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+SPOTIFY_REDIRECT_URI = 'http://127.0.0.1:8000/wraps/callback/'
+
+ACCOUNT_EMAIL_VERIFICATION = "none"  # Or "mandatory" for email verification
+LOGIN_REDIRECT_URL = '/wraps/connect/'
 
 # Debug mode
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = "True"
 
 
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -48,7 +52,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'wrapped.apps.WrappedConfig',
+    'django.contrib.sites',         # Required by allauth
+    'allauth',
+    'allauth.account',              # For user account management
+    'allauth.socialaccount',        # For social account integration
+    'allauth.socialaccount.providers.spotify',  # For Spotify integration
+    # Your app(s)                # Your custom app for the wraps
 ]
+SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -56,6 +67,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    'allauth.account.middleware.AccountMiddleware',
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -133,3 +145,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]

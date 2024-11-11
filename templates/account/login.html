@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-container">
+    <h2>Welcome Back!</h2>
+    <p>Log in to access your personalized Spotify Wrapped experience.</p>
+
+    <form method="post" action="{% url 'account_login' %}" class="login-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn-submit">Login</button>
+    </form>
+
+    <p>Don’t have an account? <a href="{% url 'account_signup' %}">Sign up here</a>.</p>
+</div>
+
+<style>
+    /* Center the form on the page */
+    .login-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 2em;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    /* Header styling */
+    .login-container h2 {
+        margin-bottom: 0.5em;
+        color: #333;
+        font-size: 1.8em;
+        font-family: Arial, sans-serif;
+    }
+
+    .login-container p {
+        color: #666;
+        font-size: 1em;
+    }
+
+    /* Style the form fields */
+    .login-form label {
+        display: block;
+        font-weight: bold;
+        color: #555;
+        text-align: left;
+    }
+
+    .login-form input[type="text"],
+    .login-form input[type="password"] {
+        width: 100%;
+        padding: 0.5em;
+        margin: 0.5em 0 1em;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1em;
+    }
+
+    /* Button styling */
+    .btn-submit {
+        background-color: #1DB954;
+        color: white;
+        padding: 0.7em 1.5em;
+        font-size: 1.1em;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background-color: #14833b;
+    }
+
+    /* Link styling */
+    .login-container a {
+        color: #1DB954;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .login-container a:hover {
+        text-decoration: underline;
+    }
+
+    /* Responsive design for smaller screens */
+    @media (max-width: 480px) {
+        .login-container {
+            padding: 1em;
+        }
+    }
+</style>
+{% endblock %}
