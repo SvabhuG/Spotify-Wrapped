@@ -2,9 +2,117 @@
 
 {% block title %}Your Spotify Wrapped{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Slider Container */
+    .slider-container {
+        position: relative;
+        max-width: 800px;
+        height: 500px;
+        margin: 2em auto;
+        overflow: hidden;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Slide Styling */
+    .slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        padding: 2em;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    .slide h2 {
+        color: #1DB954;
+        font-size: 2em;
+        margin-bottom: 1em;
+    }
+
+    .slide ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .slide li {
+        background: #f8f9fa;
+        margin: 0.5em 0;
+        padding: 1em;
+        border-radius: 8px;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+
+    .slide li:hover {
+        transform: scale(1.02);
+        background: #f0f1f2;
+    }
+
+    /* Navigation Buttons */
+    .navigation {
+        text-align: center;
+        margin: 2em 0;
+    }
+
+    .nav-button {
+        background: #1DB954;
+        color: white;
+        border: none;
+        padding: 1em 2em;
+        margin: 0 1em;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+    .nav-button:hover {
+        background: #169c46;
+    }
+
+    /* Progress Indicators */
+    .slide-indicators {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+    }
+
+    .indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ddd;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .indicator.active {
+        background: #1DB954;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="slider-container">
-    <div class="slide" style="opacity: 1;">
+    <div class="slide active">
         <h2>Your Top Tracks</h2>
         <ul>
             {% for track in wrap_data.top_tracks %}
@@ -36,38 +144,73 @@
             {% endfor %}
         </ul>
     </div>
+    <div class="slide-indicators"></div>
 </div>
 
-<!-- Navigation Buttons -->
 <div class="navigation">
     <button id="prev-slide" class="nav-button">Previous</button>
     <button id="next-slide" class="nav-button">Next</button>
 </div>
 {% endblock %}
 
+{% block extra_js %}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    let slides = document.querySelectorAll('.slide');
-    let currentSlide = 0;
+    document.addEventListener("DOMContentLoaded", function () {
+        const slides = document.querySelectorAll('.slide');
+        const indicatorsContainer = document.querySelector('.slide-indicators');
+        let currentSlide = 0;
 
-    function showSlide(index) {
-        slides.forEach((slide, i) => {
-            slide.style.opacity = i === index ? '1' : '0';
-            slide.style.position = i === index ? 'relative' : 'absolute';
+        // Create indicators
+        slides.forEach((_, index) => {
+            const indicator = document.createElement('div');
+            indicator.classList.add('indicator');
+            if (index === 0) indicator.classList.add('active');
+            indicator.addEventListener('click', () => goToSlide(index));
+            indicatorsContainer.appendChild(indicator);
         });
-    }
 
-    document.getElementById('next-slide').addEventListener('click', function () {
-        currentSlide = (currentSlide + 1) % slides.length;
-        showSlide(currentSlide);
+        const indicators = document.querySelectorAll('.indicator');
+
+        function showSlide(index) {
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+                slide.style.opacity = '0';
+            });
+
+            indicators.forEach(indicator => {
+                indicator.classList.remove('active');
+            });
+
+            slides[index].classList.add('active');
+            slides[index].style.opacity = '1';
+            indicators[index].classList.add('active');
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            showSlide(currentSlide);
+        }
+
+        document.getElementById('next-slide').addEventListener('click', function () {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        document.getElementById('prev-slide').addEventListener('click', function () {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            } else if (e.key === 'ArrowLeft') {
+                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                showSlide(currentSlide);
+            }
+        });
     });
-
-    document.getElementById('prev-slide').addEventListener('click', function () {
-        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-        showSlide(currentSlide);
-    });
-
-    // Initial display
-    showSlide(currentSlide);
-});
 </script>
+{% endblock %}
