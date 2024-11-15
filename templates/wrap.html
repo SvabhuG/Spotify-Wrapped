@@ -7,65 +7,63 @@
     /* Slider Container */
     .slider-container {
         position: relative;
-        max-width: 800px;
-        height: 500px;
+        max-width: 900px;
+        height: auto;
         margin: 2em auto;
         overflow: hidden;
-        background: white;
+        background: #222;
         border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        padding: 2em;
     }
 
     /* Slide Styling */
     .slide {
-        position: absolute;
+        display: none;
         width: 100%;
-        height: 100%;
         opacity: 0;
         transition: opacity 0.5s ease-in-out;
-        padding: 2em;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        text-align: center;
     }
 
     .slide.active {
+        display: block;
         opacity: 1;
     }
 
     .slide h2 {
         color: #1DB954;
-        font-size: 2em;
+        font-size: 2.5em;
         margin-bottom: 1em;
     }
 
-    .slide ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        max-width: 600px;
+    /* Card Styles */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1em;
     }
 
-    .slide li {
-        background: #f8f9fa;
-        margin: 0.5em 0;
-        padding: 1em;
-        border-radius: 8px;
+    .card {
+        background: #333;
+        color: white;
+        padding: 1.5em;
+        border-radius: 10px;
         text-align: center;
-        transition: transform 0.2s;
+        transition: transform 0.3s;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .slide li:hover {
-        transform: scale(1.02);
-        background: #f0f1f2;
+    .card:hover {
+        transform: translateY(-5px);
+        background: #444;
     }
 
     /* Navigation Buttons */
     .navigation {
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        gap: 1em;
         margin: 2em 0;
     }
 
@@ -74,7 +72,6 @@
         color: white;
         border: none;
         padding: 1em 2em;
-        margin: 0 1em;
         border-radius: 25px;
         cursor: pointer;
         font-weight: bold;
@@ -87,19 +84,17 @@
 
     /* Progress Indicators */
     .slide-indicators {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
         display: flex;
+        justify-content: center;
         gap: 10px;
+        margin-top: 1em;
     }
 
     .indicator {
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
-        background: #ddd;
+        background: #888;
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
@@ -114,35 +109,67 @@
 <div class="slider-container">
     <div class="slide active">
         <h2>Your Top Tracks</h2>
-        <ul>
+        <div class="card-grid">
             {% for track in wrap_data.top_tracks %}
-                <li>{{ track.name }} by {{ track.artist }}</li>
+                <div class="card">{{ track.name }} by {{ track.artist }}</div>
             {% endfor %}
-        </ul>
+        </div>
     </div>
     <div class="slide">
         <h2>Your Top Artists</h2>
-        <ul>
+        <div class="card-grid">
             {% for artist in wrap_data.top_artists %}
-                <li>{{ artist.name }}</li>
+                <div class="card">{{ artist.name }}</div>
             {% endfor %}
-        </ul>
+        </div>
     </div>
     <div class="slide">
         <h2>Your Top Genres</h2>
-        <ul>
+        <div class="card-grid">
             {% for genre in wrap_data.top_genres %}
-                <li>{{ genre }}</li>
+                <div class="card">{{ genre }}</div>
             {% endfor %}
-        </ul>
+        </div>
     </div>
     <div class="slide">
         <h2>Recently Played Tracks</h2>
-        <ul>
+        <div class="card-grid">
             {% for item in wrap_data.recently_played %}
-                <li>{{ item.track }} by {{ item.artist }}</li>
+                <div class="card">{{ item.track }} by {{ item.artist }}</div>
             {% endfor %}
-        </ul>
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Top Albums</h2>
+        <div class="card-grid">
+            {% for album in wrap_data.top_albums %}
+                <div class="card">{{ album.name }} by {{ album.artist }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Top Playlists</h2>
+        <div class="card-grid">
+            {% for playlist in wrap_data.top_playlists %}
+                <div class="card">{{ playlist.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Your Most Listened to Podcasts</h2>
+        <div class="card-grid">
+            {% for podcast in wrap_data.top_podcasts %}
+                <div class="card">{{ podcast.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Your Favorite Moods</h2>
+        <div class="card-grid">
+            {% for mood in wrap_data.favorite_moods %}
+                <div class="card">{{ mood }}</div>
+            {% endfor %}
+        </div>
     </div>
     <div class="slide-indicators"></div>
 </div>
@@ -174,15 +201,11 @@
         function showSlide(index) {
             slides.forEach(slide => {
                 slide.classList.remove('active');
-                slide.style.opacity = '0';
             });
-
             indicators.forEach(indicator => {
                 indicator.classList.remove('active');
             });
-
             slides[index].classList.add('active');
-            slides[index].style.opacity = '1';
             indicators[index].classList.add('active');
         }
 
@@ -201,7 +224,6 @@
             showSlide(currentSlide);
         });
 
-        // Add keyboard navigation
         document.addEventListener('keydown', function(e) {
             if (e.key === 'ArrowRight') {
                 currentSlide = (currentSlide + 1) % slides.length;

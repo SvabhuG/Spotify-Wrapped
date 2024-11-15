@@ -10,9 +10,9 @@ from django.conf import settings
 import json
 
 sp_oauth = SpotifyOAuth(
-    client_id=settings.SPOTIFY_CLIENT_ID,
-    client_secret=settings.SPOTIFY_CLIENT_SECRET,
-    redirect_uri=settings.SPOTIFY_REDIRECT_URI,
+    client_id = settings.SPOTIPY_CLIENT_ID,
+    client_secret = settings.SPOTIPY_CLIENT_SECRET,
+    redirect_uri = settings.SPOTIPY_REDIRECT_URI,
     scope="user-top-read user-read-recently-played user-library-read"  # Updated scope
 )
 
