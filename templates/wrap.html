@@ -4,6 +4,12 @@
 
 {% block extra_css %}
 <style>
+    /* Background for the entire page */
+    body {
+        background: linear-gradient(135deg, #1DB954, #191414);
+        color: #ffffff;
+    }
+
     /* Slider Container */
     .slider-container {
         position: relative;
@@ -11,9 +17,9 @@
         height: auto;
         margin: 2em auto;
         overflow: hidden;
-        background: #222;
+        background: #191414;
         border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         padding: 2em;
     }
 
@@ -52,6 +58,8 @@
         text-align: center;
         transition: transform 0.3s;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        max-height: 150px; /* Set a max height for the card */
+        overflow-y: auto; /* Enable vertical scrolling */
     }
 
     .card:hover {
@@ -75,11 +83,12 @@
         border-radius: 25px;
         cursor: pointer;
         font-weight: bold;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.3s ease, transform 0.3s;
     }
 
     .nav-button:hover {
-        background: #169c46;
+        background: #1ed760;
+        transform: scale(1.05);
     }
 
     /* Progress Indicators */
@@ -102,10 +111,28 @@
     .indicator.active {
         background: #1DB954;
     }
+
+    /* Top Navigation Bar */
+    .top-nav {
+        background: #191414;
+        padding: 1em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 0 0 10px 10px;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #1DB954;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="top-nav">
+    Your Spotify Wrapped
+</div>
+
 <div class="slider-container">
     <div class="slide active">
         <h2>Your Top Tracks</h2>
