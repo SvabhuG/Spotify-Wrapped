@@ -53,29 +53,40 @@
 
     /* Slider Container */
     .slider-container {
-        position: relative;
-        max-width: 900px;
-        height: auto;
-        margin: 2em auto;
-        overflow: hidden;
-        background: #191414;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        padding: 2em;
-    }
+    position: relative;
+    max-width: 900px;
+    margin: 2em auto;
+    overflow: hidden;
+    background: #191414;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    padding: 2em;
+    min-height: 450px; /* Increase minimum height */
+    height: auto; /* Allow height to adjust based on content */
+}
+
 
     /* Slide Styling */
     .slide {
-        display: none;
-        width: 100%;
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
-        text-align: center;
+    position: absolute; /* Ensure slides overlap */
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
     }
 
     .slide.active {
-        display: block;
         opacity: 1;
+        transform: translateX(0);
+        z-index: 1;
+    }
+
+    .slide.inactive {
+        opacity: 0;
+        transform: translateX(-100%);
+        z-index: 0;
     }
 
     .slide h2 {
@@ -84,28 +95,51 @@
         margin-bottom: 1em;
     }
 
-    /* Card Styles */
     .card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1em;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5em; /* Maintain spacing between cards */
+    overflow: visible; /* Ensure grid content is not cut off */
+    padding: 1.5em; /* Add space around the edges */
+}
+
+    /* Move indicators to the bottom */
+    .slide-indicators {
+    position: absolute; /* Move to the bottom of the container */
+    bottom: 10px; /* Adjust distance from the bottom */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 0; /* Remove top margin */
     }
 
+    .slide-indicators {
+    position: absolute; /* Move to the bottom of the container */
+    bottom: 10px; /* Adjust distance from the bottom */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 0; /* Remove top margin */
+    }
+
+
     .card {
-        background: #333;
-        color: white;
-        padding: 1.5em;
-        border-radius: 10px;
-        text-align: center;
-        transition: transform 0.3s;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        max-height: 150px; /* Set a max height for the card */
-        overflow-y: auto; /* Enable vertical scrolling */
+    background: #333;
+    color: white;
+    padding: 1.5em;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, opacity 0.3s;
+    max-height: 150px;
+    overflow-y: auto;
     }
 
     .card:hover {
-        transform: translateY(-5px);
-        background: #444;
+    transform: translateY(-5px);
+    background: #444;
     }
 
     /* Navigation Buttons */
@@ -130,14 +164,6 @@
     .nav-button:hover {
         background: #1ed760;
         transform: scale(1.05);
-    }
-
-    /* Progress Indicators */
-    .slide-indicators {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 1em;
     }
 
     .indicator {
@@ -235,64 +261,71 @@
 {% block extra_js %}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const slides = document.querySelectorAll('.slide');
-        const indicatorsContainer = document.querySelector('.slide-indicators');
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const indicatorsContainer = document.querySelector('.slide-indicators');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    let currentSlide = 0;
 
-        // Create indicators
-        slides.forEach((_, index) => {
-            const indicator = document.createElement('div');
-            indicator.classList.add('indicator');
-            if (index === 0) indicator.classList.add('active');
-            indicator.addEventListener('click', () => goToSlide(index));
-            indicatorsContainer.appendChild(indicator);
-        });
+    // Create indicators
+    slides.forEach((_, index) => {
+        const indicator = document.createElement('div');
+        indicator.classList.add('indicator');
+        if (index === 0) indicator.classList.add('active');
+        indicator.addEventListener('click', () => goToSlide(index));
+        indicatorsContainer.appendChild(indicator);
+    });
 
-        const indicators = document.querySelectorAll('.indicator');
+    const indicators = document.querySelectorAll('.indicator');
 
-        function showSlide(index) {
-            slides.forEach(slide => slide.classList.remove('active'));
-            indicators.forEach(indicator => indicator.classList.remove('active'));
-            slides[index].classList.add('active');
-            indicators[index].classList.add('active');
-        }
-
-        function goToSlide(index) {
-            currentSlide = index;
-            showSlide(currentSlide);
-        }
-
-        document.getElementById('next-slide').addEventListener('click', function () {
-            currentSlide = (currentSlide + 1) % slides.length;
-            showSlide(currentSlide);
-        });
-
-        document.getElementById('prev-slide').addEventListener('click', function () {
-            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-            showSlide(currentSlide);
-        });
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'ArrowRight') {
-                currentSlide = (currentSlide + 1) % slides.length;
-                showSlide(currentSlide);
-            } else if (e.key === 'ArrowLeft') {
-                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-                showSlide(currentSlide);
+    function showSlide(index) {
+        slides.forEach((slide, slideIndex) => {
+            if (slideIndex === index) {
+                slide.classList.add('active');
+                slide.classList.remove('inactive');
+            } else if (slideIndex < index) {
+                slide.classList.add('inactive');
+                slide.classList.remove('active');
+            } else {
+                slide.classList.add('inactive');
+                slide.classList.remove('active');
             }
         });
 
-        // Handle dark mode toggle
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.body.classList.add('dark-mode');
-        }
-
-        darkModeToggle.addEventListener('click', function () {
-            document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        indicators.forEach((indicator, indicatorIndex) => {
+            indicator.classList.toggle('active', indicatorIndex === index);
         });
+
+        currentSlide = index;
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        showSlide(currentSlide);
+    }
+
+    document.getElementById('next-slide').addEventListener('click', function () {
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
+    });
+
+    document.getElementById('prev-slide').addEventListener('click', function () {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        showSlide(currentSlide);
+    });
+
+    // Dark mode toggle
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+
+    darkModeToggle.addEventListener('click', function () {
+        document.body.classList.toggle('dark-mode');
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+    });
+
+    // Initial load
+    showSlide(currentSlide);
     });
 </script>
 {% endblock %}
