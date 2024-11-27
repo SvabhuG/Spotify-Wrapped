@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Authentication Error</h2>
+<p>We encountered an error while trying to connect to Spotify. Please try again.</p>
+<a href="{% url 'spotify_connect' %}">Retry Spotify Connection</a>
+{% endblock %}

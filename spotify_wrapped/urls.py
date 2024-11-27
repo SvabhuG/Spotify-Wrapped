@@ -16,8 +16,15 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from wrapped import views  # Import views from the wraps app
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('account/', include('allauth.urls')),  # For user authentication
+    path('wraps/connect/', views.spotify_connect, name='spotify_connect'),  # Connect to Spotify
+    path('wraps/callback/', views.spotify_callback, name='spotify_callback'),  # Handle Spotify callback
+    path('wraps/generate/', views.generate_wrap, name='generate_wrap'),  # Generate new wrap
+    path('wraps/history/', views.wrap_history, name='wrap_history'),  # View wrap history
+    path('wraps/replay/<int:wrap_id>/', views.replay_wrap, name='replay_wrap'),  # Replay a saved wrap
 ]
+

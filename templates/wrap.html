@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Spotify Wrapped{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Background for the entire page */
+    body {
+        background: linear-gradient(135deg, #1DB954, #191414);
+        color: #ffffff;
+    }
+
+    /* Slider Container */
+    .slider-container {
+        position: relative;
+        max-width: 900px;
+        height: auto;
+        margin: 2em auto;
+        overflow: hidden;
+        background: #191414;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        padding: 2em;
+    }
+
+    /* Slide Styling */
+    .slide {
+        display: none;
+        width: 100%;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        text-align: center;
+    }
+
+    .slide.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .slide h2 {
+        color: #1DB954;
+        font-size: 2.5em;
+        margin-bottom: 1em;
+    }
+
+    /* Card Styles */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1em;
+    }
+
+    .card {
+        background: #333;
+        color: white;
+        padding: 1.5em;
+        border-radius: 10px;
+        text-align: center;
+        transition: transform 0.3s;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        max-height: 150px; /* Set a max height for the card */
+        overflow-y: auto; /* Enable vertical scrolling */
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        background: #444;
+    }
+
+    /* Navigation Buttons */
+    .navigation {
+        display: flex;
+        justify-content: center;
+        gap: 1em;
+        margin: 2em 0;
+    }
+
+    .nav-button {
+        background: #1DB954;
+        color: white;
+        border: none;
+        padding: 1em 2em;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.3s;
+    }
+
+    .nav-button:hover {
+        background: #1ed760;
+        transform: scale(1.05);
+    }
+
+    /* Progress Indicators */
+    .slide-indicators {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 1em;
+    }
+
+    .indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #888;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .indicator.active {
+        background: #1DB954;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+        background: #191414;
+        padding: 1em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 0 0 10px 10px;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #1DB954;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="top-nav">
+    Your Spotify Wrapped
+</div>
+
+<div class="slider-container">
+    <div class="slide active">
+        <h2>Your Top Tracks</h2>
+        <div class="card-grid">
+            {% for track in wrap_data.top_tracks %}
+                <div class="card">{{ track.name }} by {{ track.artist }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Your Top Artists</h2>
+        <div class="card-grid">
+            {% for artist in wrap_data.top_artists %}
+                <div class="card">{{ artist.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Your Top Genres</h2>
+        <div class="card-grid">
+            {% for genre in wrap_data.top_genres %}
+                <div class="card">{{ genre }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Recently Played Tracks</h2>
+        <div class="card-grid">
+            {% for item in wrap_data.recently_played %}
+                <div class="card">{{ item.track }} by {{ item.artist }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Top Albums</h2>
+        <div class="card-grid">
+            {% for album in wrap_data.top_albums %}
+                <div class="card">{{ album.name }} by {{ album.artist }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Top Playlists</h2>
+        <div class="card-grid">
+            {% for playlist in wrap_data.top_playlists %}
+                <div class="card">{{ playlist.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Your Most Listened to Podcasts</h2>
+        <div class="card-grid">
+            {% for podcast in wrap_data.top_podcasts %}
+                <div class="card">{{ podcast.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide">
+        <h2>Your Favorite Moods</h2>
+        <div class="card-grid">
+            {% for mood in wrap_data.favorite_moods %}
+                <div class="card">{{ mood }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="slide-indicators"></div>
+</div>
+
+<div class="navigation">
+    <button id="prev-slide" class="nav-button">Previous</button>
+    <button id="next-slide" class="nav-button">Next</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const slides = document.querySelectorAll('.slide');
+        const indicatorsContainer = document.querySelector('.slide-indicators');
+        let currentSlide = 0;
+
+        // Create indicators
+        slides.forEach((_, index) => {
+            const indicator = document.createElement('div');
+            indicator.classList.add('indicator');
+            if (index === 0) indicator.classList.add('active');
+            indicator.addEventListener('click', () => goToSlide(index));
+            indicatorsContainer.appendChild(indicator);
+        });
+
+        const indicators = document.querySelectorAll('.indicator');
+
+        function showSlide(index) {
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            indicators.forEach(indicator => {
+                indicator.classList.remove('active');
+            });
+            slides[index].classList.add('active');
+            indicators[index].classList.add('active');
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            showSlide(currentSlide);
+        }
+
+        document.getElementById('next-slide').addEventListener('click', function () {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        document.getElementById('prev-slide').addEventListener('click', function () {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            } else if (e.key === 'ArrowLeft') {
+                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                showSlide(currentSlide);
+            }
+        });
+    });
+</script>
+{% endblock %}
