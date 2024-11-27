@@ -63,7 +63,7 @@
     <header>
         <h1 class="header-title">My Spotify Wrap</h1>
         <nav>
-            <a href="/">Home</a>
+            <a href="{% url 'wrap_history' %}">Home</a>
             {% if user.is_authenticated %}
                 <a href="{% url 'account_logout' %}">Logout</a>
             {% else %}
