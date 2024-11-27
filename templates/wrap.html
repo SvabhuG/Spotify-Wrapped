@@ -10,6 +10,47 @@
         color: #ffffff;
     }
 
+    /* Dark Mode Styles */
+    body.dark-mode {
+        background: linear-gradient(135deg, #191414, #1DB954);
+        color: #cccccc;
+    }
+
+    body.dark-mode .slider-container {
+        background: #333;
+    }
+
+    body.dark-mode .card {
+        background: #444;
+        color: #eeeeee;
+    }
+
+    body.dark-mode .card:hover {
+        background: #555;
+    }
+
+    body.dark-mode .nav-button {
+        background: #333;
+        color: #1DB954;
+    }
+
+    body.dark-mode .nav-button:hover {
+        background: #444;
+    }
+
+    body.dark-mode .indicator {
+        background: #555;
+    }
+
+    body.dark-mode .indicator.active {
+        background: #1DB954;
+    }
+
+    body.dark-mode .top-nav {
+        background: #1DB954;
+        color: #191414;
+    }
+
     /* Slider Container */
     .slider-container {
         position: relative;
@@ -125,12 +166,28 @@
         font-weight: bold;
         color: #1DB954;
     }
+
+    .dark-mode-button {
+        background: #1DB954;
+        color: #191414;
+        border: none;
+        padding: 0.5em 1em;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-left: 1em;
+    }
+
+    .dark-mode-button:hover {
+        background: #1ed760;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="top-nav">
     Your Spotify Wrapped
+    <button id="dark-mode-toggle" class="dark-mode-button">Toggle Dark Mode</button>
 </div>
 
 <div class="slider-container">
@@ -166,38 +223,6 @@
             {% endfor %}
         </div>
     </div>
-    <div class="slide">
-        <h2>Top Albums</h2>
-        <div class="card-grid">
-            {% for album in wrap_data.top_albums %}
-                <div class="card">{{ album.name }} by {{ album.artist }}</div>
-            {% endfor %}
-        </div>
-    </div>
-    <div class="slide">
-        <h2>Top Playlists</h2>
-        <div class="card-grid">
-            {% for playlist in wrap_data.top_playlists %}
-                <div class="card">{{ playlist.name }}</div>
-            {% endfor %}
-        </div>
-    </div>
-    <div class="slide">
-        <h2>Your Most Listened to Podcasts</h2>
-        <div class="card-grid">
-            {% for podcast in wrap_data.top_podcasts %}
-                <div class="card">{{ podcast.name }}</div>
-            {% endfor %}
-        </div>
-    </div>
-    <div class="slide">
-        <h2>Your Favorite Moods</h2>
-        <div class="card-grid">
-            {% for mood in wrap_data.favorite_moods %}
-                <div class="card">{{ mood }}</div>
-            {% endfor %}
-        </div>
-    </div>
     <div class="slide-indicators"></div>
 </div>
 
@@ -212,6 +237,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         const slides = document.querySelectorAll('.slide');
         const indicatorsContainer = document.querySelector('.slide-indicators');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
         let currentSlide = 0;
 
         // Create indicators
@@ -226,12 +252,8 @@
         const indicators = document.querySelectorAll('.indicator');
 
         function showSlide(index) {
-            slides.forEach(slide => {
-                slide.classList.remove('active');
-            });
-            indicators.forEach(indicator => {
-                indicator.classList.remove('active');
-            });
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
             slides[index].classList.add('active');
             indicators[index].classList.add('active');
         }
@@ -251,7 +273,7 @@
             showSlide(currentSlide);
         });
 
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'ArrowRight') {
                 currentSlide = (currentSlide + 1) % slides.length;
                 showSlide(currentSlide);
@@ -259,6 +281,17 @@
                 currentSlide = (currentSlide - 1 + slides.length) % slides.length;
                 showSlide(currentSlide);
             }
+        });
+
+        // Handle dark mode toggle
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+
+        darkModeToggle.addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
         });
     });
 </script>
