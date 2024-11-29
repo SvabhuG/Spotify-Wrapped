@@ -1,0 +1,64 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-28 20:30-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: French <LL@li.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: templates/wrap.html:3 templates/wrap.html:224
+msgid "Your Spotify Wrapped"
+msgstr "Votre Spotify Wrapped"
+
+#: templates/wrap.html:225
+msgid "Toggle Dark Mode"
+msgstr "Basculer en mode sombre"
+
+#: templates/wrap.html:239
+msgid "Switch Language"
+msgstr "Changer de langue"
+
+#: templates/wrap.html:245
+msgid "Your Top Tracks"
+msgstr "Vos meilleurs titres"
+
+#: templates/wrap.html:249
+#, python-format
+msgid "%(track.name)s by %(track.artist)s"
+msgstr "%(track.name)s par %(track.artist)s"
+
+#: templates/wrap.html:255
+msgid "Your Top Artists"
+msgstr "Vos meilleurs artistes"
+
+#: templates/wrap.html:263
+msgid "Your Top Genres"
+msgstr "Vos genres préférés"
+
+#: templates/wrap.html:271
+msgid "Recently Played Tracks"
+msgstr "Titres écoutés récemment"
+
+#: templates/wrap.html:275
+#, python-format
+msgid "%(item.track)s by %(item.artist)s"
+msgstr "%(item.track)s par %(item.artist)s"
+
+#: templates/wrap.html:284
+msgid "Previous"
+msgstr "Précédent"
+
+#: templates/wrap.html:285
+msgid "Next"
+msgstr "Suivant"

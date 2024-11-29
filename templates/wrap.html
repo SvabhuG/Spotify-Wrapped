@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Your Spotify Wrapped{% endblock %}
+{% block title %}{% trans "Your Spotify Wrapped" %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -53,28 +54,27 @@
 
     /* Slider Container */
     .slider-container {
-    position: relative;
-    max-width: 900px;
-    margin: 2em auto;
-    overflow: hidden;
-    background: #191414;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    padding: 2em;
-    min-height: 450px; /* Increase minimum height */
-    height: auto; /* Allow height to adjust based on content */
-}
-
+        position: relative;
+        max-width: 900px;
+        margin: 2em auto;
+        overflow: hidden;
+        background: #191414;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        padding: 2em;
+        min-height: 450px; /* Increase minimum height */
+        height: auto; /* Allow height to adjust based on content */
+    }
 
     /* Slide Styling */
     .slide {
-    position: absolute; /* Ensure slides overlap */
-    top: 0;
-    left: 0;
-    width: 100%;
-    opacity: 0;
-    transform: translateX(100%);
-    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        position: absolute; /* Ensure slides overlap */
+        top: 0;
+        left: 0;
+        width: 100%;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
     }
 
     .slide.active {
@@ -96,50 +96,39 @@
     }
 
     .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5em; /* Maintain spacing between cards */
-    overflow: visible; /* Ensure grid content is not cut off */
-    padding: 1.5em; /* Add space around the edges */
-}
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5em; /* Maintain spacing between cards */
+        overflow: visible; /* Ensure grid content is not cut off */
+        padding: 1.5em; /* Add space around the edges */
+    }
 
     /* Move indicators to the bottom */
     .slide-indicators {
-    position: absolute; /* Move to the bottom of the container */
-    bottom: 10px; /* Adjust distance from the bottom */
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 0; /* Remove top margin */
+        position: absolute; /* Move to the bottom of the container */
+        bottom: 10px; /* Adjust distance from the bottom */
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 0; /* Remove top margin */
     }
-
-    .slide-indicators {
-    position: absolute; /* Move to the bottom of the container */
-    bottom: 10px; /* Adjust distance from the bottom */
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 0; /* Remove top margin */
-    }
-
 
     .card {
-    background: #333;
-    color: white;
-    padding: 1.5em;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s, opacity 0.3s;
-    max-height: 150px;
-    overflow-y: auto;
+        background: #333;
+        color: white;
+        padding: 1.5em;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s, opacity 0.3s;
+        max-height: 150px;
+        overflow-y: auto;
     }
 
     .card:hover {
-    transform: translateY(-5px);
-    background: #444;
+        transform: translateY(-5px);
+        background: #444;
     }
 
     /* Navigation Buttons */
@@ -207,26 +196,64 @@
     .dark-mode-button:hover {
         background: #1ed760;
     }
+
+    /* Language Switcher Styles */
+    .language-switcher select,
+    .language-switcher button {
+        background: #1DB954;
+        color: #ffffff;
+        border: none;
+        padding: 0.5em 1em;
+        border-radius: 25px;
+        cursor: pointer;
+        margin-left: 0.5em;
+    }
+
+    .language-switcher select {
+        padding-right: 2em;
+    }
+
+    .language-switcher button:hover,
+    .language-switcher select:hover {
+        background: #1ed760;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="top-nav">
-    Your Spotify Wrapped
-    <button id="dark-mode-toggle" class="dark-mode-button">Toggle Dark Mode</button>
+    {% trans "Your Spotify Wrapped" %}
+    <button id="dark-mode-toggle" class="dark-mode-button">{% trans "Toggle Dark Mode" %}</button>
+    <!-- Language Switcher Form -->
+    <form action="{% url 'set_language' %}" method="post" class="language-switcher">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.path }}">
+        <select name="language">
+            {% get_current_language as LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% for lang in LANGUAGES %}
+                <option value="{{ lang.0 }}"{% if lang.0 == LANGUAGE_CODE %} selected{% endif %}>
+                    {{ lang.1 }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">{% trans "Switch Language" %}</button>
+    </form>
 </div>
 
 <div class="slider-container">
     <div class="slide active">
-        <h2>Your Top Tracks</h2>
+        <h2>{% trans "Your Top Tracks" %}</h2>
         <div class="card-grid">
             {% for track in wrap_data.top_tracks %}
-                <div class="card">{{ track.name }} by {{ track.artist }}</div>
+                <div class="card">
+                    {% blocktrans %}{{ track.name }} by {{ track.artist }}{% endblocktrans %}
+                </div>
             {% endfor %}
         </div>
     </div>
     <div class="slide">
-        <h2>Your Top Artists</h2>
+        <h2>{% trans "Your Top Artists" %}</h2>
         <div class="card-grid">
             {% for artist in wrap_data.top_artists %}
                 <div class="card">{{ artist.name }}</div>
@@ -234,7 +261,7 @@
         </div>
     </div>
     <div class="slide">
-        <h2>Your Top Genres</h2>
+        <h2>{% trans "Your Top Genres" %}</h2>
         <div class="card-grid">
             {% for genre in wrap_data.top_genres %}
                 <div class="card">{{ genre }}</div>
@@ -242,10 +269,12 @@
         </div>
     </div>
     <div class="slide">
-        <h2>Recently Played Tracks</h2>
+        <h2>{% trans "Recently Played Tracks" %}</h2>
         <div class="card-grid">
             {% for item in wrap_data.recently_played %}
-                <div class="card">{{ item.track }} by {{ item.artist }}</div>
+                <div class="card">
+                    {% blocktrans %}{{ item.track }} by {{ item.artist }}{% endblocktrans %}
+                </div>
             {% endfor %}
         </div>
     </div>
@@ -253,79 +282,79 @@
 </div>
 
 <div class="navigation">
-    <button id="prev-slide" class="nav-button">Previous</button>
-    <button id="next-slide" class="nav-button">Next</button>
+    <button id="prev-slide" class="nav-button">{% trans "Previous" %}</button>
+    <button id="next-slide" class="nav-button">{% trans "Next" %}</button>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-    const slides = document.querySelectorAll('.slide');
-    const indicatorsContainer = document.querySelector('.slide-indicators');
-    const darkModeToggle = document.getElementById('dark-mode-toggle');
-    let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const indicatorsContainer = document.querySelector('.slide-indicators');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        let currentSlide = 0;
 
-    // Create indicators
-    slides.forEach((_, index) => {
-        const indicator = document.createElement('div');
-        indicator.classList.add('indicator');
-        if (index === 0) indicator.classList.add('active');
-        indicator.addEventListener('click', () => goToSlide(index));
-        indicatorsContainer.appendChild(indicator);
-    });
-
-    const indicators = document.querySelectorAll('.indicator');
-
-    function showSlide(index) {
-        slides.forEach((slide, slideIndex) => {
-            if (slideIndex === index) {
-                slide.classList.add('active');
-                slide.classList.remove('inactive');
-            } else if (slideIndex < index) {
-                slide.classList.add('inactive');
-                slide.classList.remove('active');
-            } else {
-                slide.classList.add('inactive');
-                slide.classList.remove('active');
-            }
+        // Create indicators
+        slides.forEach((_, index) => {
+            const indicator = document.createElement('div');
+            indicator.classList.add('indicator');
+            if (index === 0) indicator.classList.add('active');
+            indicator.addEventListener('click', () => goToSlide(index));
+            indicatorsContainer.appendChild(indicator);
         });
 
-        indicators.forEach((indicator, indicatorIndex) => {
-            indicator.classList.toggle('active', indicatorIndex === index);
+        const indicators = document.querySelectorAll('.indicator');
+
+        function showSlide(index) {
+            slides.forEach((slide, slideIndex) => {
+                if (slideIndex === index) {
+                    slide.classList.add('active');
+                    slide.classList.remove('inactive');
+                } else if (slideIndex < index) {
+                    slide.classList.add('inactive');
+                    slide.classList.remove('active');
+                } else {
+                    slide.classList.add('inactive');
+                    slide.classList.remove('active');
+                }
+            });
+
+            indicators.forEach((indicator, indicatorIndex) => {
+                indicator.classList.toggle('active', indicatorIndex === index);
+            });
+
+            currentSlide = index;
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            showSlide(currentSlide);
+        }
+
+        document.getElementById('next-slide').addEventListener('click', function () {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
         });
 
-        currentSlide = index;
-    }
+        document.getElementById('prev-slide').addEventListener('click', function () {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        });
 
-    function goToSlide(index) {
-        currentSlide = index;
+        // Dark mode toggle
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+
+        darkModeToggle.addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        });
+
+        // Initial load
         showSlide(currentSlide);
-    }
-
-    document.getElementById('next-slide').addEventListener('click', function () {
-        currentSlide = (currentSlide + 1) % slides.length;
-        showSlide(currentSlide);
-    });
-
-    document.getElementById('prev-slide').addEventListener('click', function () {
-        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-        showSlide(currentSlide);
-    });
-
-    // Dark mode toggle
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add('dark-mode');
-    }
-
-    darkModeToggle.addEventListener('click', function () {
-        document.body.classList.toggle('dark-mode');
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-    });
-
-    // Initial load
-    showSlide(currentSlide);
     });
 </script>
 {% endblock %}
