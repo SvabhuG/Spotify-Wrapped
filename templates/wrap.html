@@ -17,41 +17,6 @@
         color: #cccccc;
     }
 
-    body.dark-mode .slider-container {
-        background: #333;
-    }
-
-    body.dark-mode .card {
-        background: #444;
-        color: #eeeeee;
-    }
-
-    body.dark-mode .card:hover {
-        background: #555;
-    }
-
-    body.dark-mode .nav-button {
-        background: #333;
-        color: #1DB954;
-    }
-
-    body.dark-mode .nav-button:hover {
-        background: #444;
-    }
-
-    body.dark-mode .indicator {
-        background: #555;
-    }
-
-    body.dark-mode .indicator.active {
-        background: #1DB954;
-    }
-
-    body.dark-mode .top-nav {
-        background: #1DB954;
-        color: #191414;
-    }
-
     /* Slider Container */
     .slider-container {
         position: relative;
@@ -62,16 +27,18 @@
         border-radius: 15px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         padding: 2em;
-        min-height: 450px; /* Increase minimum height */
-        height: auto; /* Allow height to adjust based on content */
+        min-height: 450px;
     }
 
     /* Slide Styling */
     .slide {
-        position: absolute; /* Ensure slides overlap */
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
+        height: calc(100% - 50px); /* Adjusted to account for slide indicators */
+        overflow-y: auto; /* Enables vertical scrolling */
+        padding-bottom: 1em; /* Adds space at the bottom */
         opacity: 0;
         transform: translateX(100%);
         transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
@@ -93,37 +60,27 @@
         color: #1DB954;
         font-size: 2.5em;
         margin-bottom: 1em;
+        text-align: center;
     }
 
     .card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1.5em; /* Maintain spacing between cards */
-        overflow: visible; /* Ensure grid content is not cut off */
-        padding: 1.5em; /* Add space around the edges */
-    }
-
-    /* Move indicators to the bottom */
-    .slide-indicators {
-        position: absolute; /* Move to the bottom of the container */
-        bottom: 10px; /* Adjust distance from the bottom */
-        width: 100%;
         display: flex;
+        flex-wrap: wrap;
         justify-content: center;
-        gap: 10px;
-        margin: 0; /* Remove top margin */
+        gap: 1.5em;
+        padding: 1.5em;
     }
 
     .card {
         background: #333;
         color: white;
-        padding: 1.5em;
+        padding: 1em;
         border-radius: 10px;
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: transform 0.3s, opacity 0.3s;
-        max-height: 150px;
-        overflow-y: auto;
+        max-width: 200px;
+        flex: 1 1 calc(33.33% - 2em);
     }
 
     .card:hover {
@@ -137,6 +94,7 @@
         justify-content: center;
         gap: 1em;
         margin: 2em 0;
+        flex-wrap: wrap;
     }
 
     .nav-button {
@@ -153,6 +111,20 @@
     .nav-button:hover {
         background: #1ed760;
         transform: scale(1.05);
+    }
+
+    /* Slide Indicators */
+    .slide-indicators {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5em;
+        margin-top: 1em;
+        position: absolute;
+        bottom: 1em;
+        left: 0;
+        width: 100%;
+        z-index: 2; /* Ensures indicators are above slides */
     }
 
     .indicator {
@@ -175,7 +147,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        flex-wrap: wrap; /* Allow items to wrap to the next line if needed */
+        flex-wrap: wrap;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         border-radius: 0 0 10px 10px;
         font-size: 1.2em;
@@ -223,6 +195,62 @@
     .language-switcher button:hover,
     .language-switcher select:hover {
         background: #1ed760;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .slide h2 {
+            font-size: 2em;
+        }
+
+        .card {
+            flex: 1 1 calc(50% - 2em);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .top-nav {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .dark-mode-button {
+            margin-left: 0;
+            margin-top: 1em;
+        }
+
+        .language-switcher {
+            margin-left: 0;
+            margin-top: 1em;
+        }
+
+        .slide h2 {
+            font-size: 1.5em;
+        }
+
+        .card {
+            flex: 1 1 100%;
+        }
+
+        .nav-button {
+            padding: 0.8em 1.5em;
+            font-size: 0.9em;
+        }
+
+        .navigation {
+            flex-direction: column;
+            gap: 0.5em;
+        }
+
+        /* Adjust slide indicators */
+        .slide-indicators {
+            bottom: 0.5em;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+        }
     }
 </style>
 {% endblock %}
@@ -285,6 +313,7 @@
             {% endfor %}
         </div>
     </div>
+    <!-- Slide Indicators -->
     <div class="slide-indicators"></div>
 </div>
 
