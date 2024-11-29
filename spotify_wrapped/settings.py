@@ -32,7 +32,8 @@ SPOTIPY_REDIRECT_URI = os.getenv("SPOTIPY_REDIRECT_URI")
 # Django Allauth settings
 SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = "none"  # Or "mandatory" for email verification
-LOGIN_REDIRECT_URL = '/wraps/connect/'
+LOGIN_REDIRECT_URL = '/en/wraps/history/'
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -125,7 +126,7 @@ LOCALE_PATHS = [
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "wrapped/static"]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
