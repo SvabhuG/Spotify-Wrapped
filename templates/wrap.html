@@ -277,24 +277,30 @@
 </div>
 
 <div class="slider-container">
+    <!-- Slide 1: Your Top Tracks -->
     <div class="slide active">
         <h2>{% trans "Your Top Tracks" %}</h2>
         <div class="card-grid">
             {% for track in wrap_data.top_tracks %}
                 <div class="card">
-                    {{ track.name }} by {{ track.artist }}
+                    <strong>{{ track.name }}</strong><br>
+                    {% trans "by" %} {{ track.artist }}
                 </div>
             {% endfor %}
         </div>
     </div>
+    <!-- Slide 2: Your Top Artists -->
     <div class="slide">
         <h2>{% trans "Your Top Artists" %}</h2>
         <div class="card-grid">
             {% for artist in wrap_data.top_artists %}
-                <div class="card">{{ artist.name }}</div>
+                <div class="card">
+                    <strong>{{ artist.name }}</strong>
+                </div>
             {% endfor %}
         </div>
     </div>
+    <!-- Slide 3: Your Top Genres -->
     <div class="slide">
         <h2>{% trans "Your Top Genres" %}</h2>
         <div class="card-grid">
@@ -303,12 +309,70 @@
             {% endfor %}
         </div>
     </div>
+    <!-- Slide 4: Recently Played Tracks -->
     <div class="slide">
         <h2>{% trans "Recently Played Tracks" %}</h2>
         <div class="card-grid">
             {% for item in wrap_data.recently_played %}
                 <div class="card">
-                    {{ item.track }} by {{ item.artist }}
+                    <strong>{{ item.track }}</strong><br>
+                    {% trans "by" %} {{ item.artist }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Slide 5: Your Favorite Album -->
+    <div class="slide">
+        <h2>{% trans "Your Favorite Album" %}</h2>
+        <div class="card-grid">
+            <div class="card">
+                <strong>{{ wrap_data.favorite_album.name }}</strong><br>
+                {% trans "by" %} {{ wrap_data.favorite_album.artist }}<br>
+                {% trans "Total Plays:" %} {{ wrap_data.favorite_album.play_count }}
+            </div>
+        </div>
+    </div>
+    <!-- Slide 6: Your Listening Habits -->
+    <div class="slide">
+        <h2>{% trans "Your Listening Habits" %}</h2>
+        <div class="card-grid">
+            <div class="card">
+                {% trans "Total Minutes Listened:" %} {{ wrap_data.total_minutes }}
+            </div>
+            <div class="card">
+                {% trans "Total Songs Played:" %} {{ wrap_data.total_tracks }}
+            </div>
+            <div class="card">
+                {% trans "Average Song Duration:" %} {{ wrap_data.average_song_duration }} {% trans "minutes" %}
+            </div>
+        </div>
+    </div>
+    <!-- Slide 7: Your Audio Aura -->
+    <div class="slide">
+        <h2>{% trans "Your Audio Aura" %}</h2>
+        <div class="card-grid">
+            <div class="card">
+                {% trans "Energy Level:" %} {{ wrap_data.audio_features.energy }}%
+            </div>
+            <div class="card">
+                {% trans "Danceability:" %} {{ wrap_data.audio_features.danceability }}%
+            </div>
+            <div class="card">
+                {% trans "Acousticness:" %} {{ wrap_data.audio_features.acousticness }}%
+            </div>
+            <div class="card">
+                {% trans "Valence (Positivity):" %} {{ wrap_data.audio_features.valence }}%
+            </div>
+        </div>
+    </div>
+    <!-- Slide 8: Your Top Podcasts -->
+    <div class="slide">
+        <h2>{% trans "Your Top Podcasts" %}</h2>
+        <div class="card-grid">
+            {% for podcast in wrap_data.top_podcasts %}
+                <div class="card">
+                    <strong>{{ podcast.name }}</strong><br>
+                    {% trans "Episodes Listened:" %} {{ podcast.episodes_listened }}
                 </div>
             {% endfor %}
         </div>

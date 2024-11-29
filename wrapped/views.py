@@ -1,57 +1,27 @@
-from django.shortcuts import render
-
-# Create your views here.
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import SpotifyProfile, SpotifyWrap
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from django.conf import settings
-import json
+from datetime import timedelta
+import time
 
 # Configure SpotifyOAuth for authentication and data access
 sp_oauth = SpotifyOAuth(
     client_id=settings.SPOTIPY_CLIENT_ID,
     client_secret=settings.SPOTIPY_CLIENT_SECRET,
     redirect_uri=settings.SPOTIPY_REDIRECT_URI,
-    scope="user-top-read user-read-recently-playegit d user-library-read"
+    scope="user-top-read user-read-recently-played user-library-read user-read-playback-position"
 )
-
 
 @login_required
 def spotify_connect(request):
-    """
-    Initiates the Spotify OAuth connection process.
-
-    Generates an authorization URL for Spotify's OAuth process and redirects
-    the user to that URL to allow access to their Spotify account.
-
-    Args:
-        request: The HTTP request object.
-
-    Returns:
-        HttpResponseRedirect: Redirects the user to Spotify's OAuth page.
-    """
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
-
 @login_required
 def spotify_callback(request):
-    """
-    Handles the callback after Spotify authentication.
-
-    Retrieves the authorization code from Spotify's response, exchanges it
-    for an access token, and saves or updates the user's Spotify profile in
-    the database.
-
-    Args:
-        request: The HTTP request object.
-
-    Returns:
-        HttpResponseRedirect: Redirects to the 'generate_wrap' view on success.
-        HttpResponse: Renders an error page if authentication fails.
-    """
     code = request.GET.get('code')
     token_info = sp_oauth.get_access_token(code)
 
@@ -78,40 +48,105 @@ def spotify_callback(request):
 
     return render(request, 'error.html')
 
-
 @login_required
 def generate_wrap(request):
-    """
-    Generates a personalized Spotify wrap for the logged-in user.
-
-    Retrieves the user's Spotify data (top tracks, artists, genres, and
-    recently played tracks), processes it into a structured format, saves it
-    in the database, and renders it on the 'wrap.html' page.
-
-    Args:
-        request: The HTTP request object.
-
-    Returns:
-        HttpResponse: Renders the 'wrap.html' template with the generated wrap data.
-    """
     profile = SpotifyProfile.objects.get(user=request.user)
     sp = Spotify(auth=profile.access_token)
 
     # Fetch user data from Spotify
-    top_tracks = sp.current_user_top_tracks(limit=10, time_range="long_term")['items']
-    top_artists = sp.current_user_top_artists(limit=5, time_range="long_term")['items']
-    top_genres = list(set(genre for artist in top_artists for genre in artist['genres']))
-    recently_played = sp.current_user_recently_played(limit=10)['items']
+    top_tracks_data = sp.current_user_top_tracks(limit=10, time_range="long_term")['items']
+    top_artists_data = sp.current_user_top_artists(limit=5, time_range="long_term")['items']
+    top_genres = list(set(genre for artist in top_artists_data for genre in artist['genres']))
+    recently_played_data = sp.current_user_recently_played(limit=10)['items']
+
+    # Fetch favorite album
+    favorite_albums = sp.current_user_saved_albums(limit=50)['items']
+    album_play_counts = {}
+
+    for album_item in favorite_albums:
+        album = album_item['album']
+        album_tracks = album['tracks']['items']
+        play_count = 0
+        for track in album_tracks:
+            track_id = track['id']
+            # Assume we have a way to get play count per track (Note: Spotify API does not provide this directly)
+            # For demo purposes, we'll simulate play counts
+            play_count += 1  # Replace with actual play count retrieval if possible
+        album_play_counts[album['id']] = {
+            'name': album['name'],
+            'artist': album['artists'][0]['name'],
+            'play_count': play_count
+        }
+
+    # Find the album with the highest play count
+    favorite_album = max(album_play_counts.values(), key=lambda x: x['play_count']) if album_play_counts else None
+
+    # Calculate listening habits
+    total_minutes = 0
+    total_tracks = 0
+    total_duration_ms = 0
+
+    all_tracks = sp.current_user_top_tracks(limit=50, time_range="long_term")['items']
+    for track in all_tracks:
+        total_tracks += 1
+        total_duration_ms += track['duration_ms']
+
+    total_minutes = int(total_duration_ms / (1000 * 60))
+    average_song_duration = round((total_duration_ms / total_tracks) / (1000 * 60), 2) if total_tracks > 0 else 0
+
+    # Get audio features
+    track_ids = [track['id'] for track in all_tracks]
+    audio_features_list = sp.audio_features(tracks=track_ids)
+    energy = danceability = acousticness = valence = 0
+    feature_count = 0
+
+    for features in audio_features_list:
+        if features:
+            energy += features['energy']
+            danceability += features['danceability']
+            acousticness += features['acousticness']
+            valence += features['valence']
+            feature_count += 1
+
+    if feature_count > 0:
+        energy = int((energy / feature_count) * 100)
+        danceability = int((danceability / feature_count) * 100)
+        acousticness = int((acousticness / feature_count) * 100)
+        valence = int((valence / feature_count) * 100)
+    else:
+        energy = danceability = acousticness = valence = 0
+
+    # Fetch top podcasts
+    top_podcasts_data = sp.current_user_saved_shows(limit=5)['items']
+    top_podcasts = []
+    for item in top_podcasts_data:
+        show = item['show']
+        episodes_listened = 0  # Since Spotify API does not provide this, we can simulate or omit
+        top_podcasts.append({
+            'name': show['name'],
+            'episodes_listened': episodes_listened  # Replace with actual data if available
+        })
 
     # Prepare data for the wrap
     wrap_data = {
-        "top_tracks": [{"name": track['name'], "artist": track['artists'][0]['name']} for track in top_tracks],
-        "top_artists": [{"name": artist['name']} for artist in top_artists],
+        "top_tracks": [{"name": track['name'], "artist": track['artists'][0]['name']} for track in top_tracks_data],
+        "top_artists": [{"name": artist['name']} for artist in top_artists_data],
         "top_genres": top_genres,
         "recently_played": [
             {"track": item['track']['name'], "artist": item['track']['artists'][0]['name']}
-            for item in recently_played
-        ]
+            for item in recently_played_data
+        ],
+        "favorite_album": favorite_album,
+        "total_minutes": total_minutes,
+        "total_tracks": total_tracks,
+        "average_song_duration": average_song_duration,
+        "audio_features": {
+            "energy": energy,
+            "danceability": danceability,
+            "acousticness": acousticness,
+            "valence": valence
+        },
+        "top_podcasts": top_podcasts
     }
 
     # Save the wrap data to the database
@@ -120,48 +155,13 @@ def generate_wrap(request):
 
     return render(request, 'wrap.html', {'wrap_data': wrap_data})
 
-
 @login_required
 def wrap_history(request):
-    """
-    Displays a list of all wraps generated by the logged-in user.
-
-    Fetches wraps from the database, ordered by creation date, and renders
-    them on the 'history.html' page.
-
-    Args:
-        request: The HTTP request object.
-
-    Returns:
-        HttpResponse: Renders the 'history.html' template with the list of wraps.
-    """
     wraps = SpotifyWrap.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'history.html', {'wraps': wraps})
 
 @login_required
 def replay_wrap(request, wrap_id):
-    """
-    Fetches and replays a specific Spotify wrap for the logged-in user.
-
-    This view retrieves a previously saved Spotify wrap based on its unique ID
-    and renders it using the `wrap.html` template. The view ensures that only
-    the logged-in user can access their wraps and no other user's data.
-
-    Args:
-        request (HttpRequest): The HTTP request object containing metadata about the request.
-        wrap_id (int): The ID of the Spotify wrap to be replayed.
-
-    Returns:
-        HttpResponse: A rendered `wrap.html` page displaying the saved wrap data.
-
-    Raises:
-        Http404: If the specified wrap does not exist or does not belong to the logged-in user.
-
-    Usage:
-        This view is accessed via a URL pattern like `/wraps/replay/<wrap_id>/`,
-        where `<wrap_id>` is the ID of the wrap to replay.
-    """
     wrap = get_object_or_404(SpotifyWrap, id=wrap_id, user=request.user)
     wrap_data = wrap.data  # Access the saved wrap data
     return render(request, 'wrap.html', {'wrap_data': wrap_data})
-

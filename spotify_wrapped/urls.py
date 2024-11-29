@@ -1,21 +1,4 @@
-"""
-URL configuration for spotify_wrapped project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
-# your_project/urls.py
+# urls.py
 
 from django.contrib import admin
 from django.urls import path, include
@@ -29,13 +12,12 @@ urlpatterns = [
 ]
 
 urlpatterns += i18n_patterns(
-    # Root URL mapping
-    path('', RedirectView.as_view(pattern_name='wrap_history', permanent=False), name='home'),
-    # Alternatively, you can map directly to a view:
-    # path('', views.wrap_history, name='home'),
+    # Root URL mapping - redirect to login page
+    path('', RedirectView.as_view(pattern_name='account_login', permanent=False), name='home'),
 
     # Application URLs
     path('account/', include('allauth.urls')),  # For user authentication
+
     path('wraps/connect/', views.spotify_connect, name='spotify_connect'),  # Connect to Spotify
     path('wraps/callback/', views.spotify_callback, name='spotify_callback'),  # Handle Spotify callback
     path('wraps/generate/', views.generate_wrap, name='generate_wrap'),  # Generate new wrap
