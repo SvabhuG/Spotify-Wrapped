@@ -14,7 +14,7 @@ sp_oauth = SpotifyOAuth(
     client_id=settings.SPOTIPY_CLIENT_ID,
     client_secret=settings.SPOTIPY_CLIENT_SECRET,
     redirect_uri=settings.SPOTIPY_REDIRECT_URI,
-    scope="user-top-read user-read-recently-played user-library-read"
+    scope="user-top-read user-read-recently-playegit d user-library-read"
 )
 
 

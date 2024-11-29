@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Your Spotify Wrap History{% endblock %}
+{% block title %}{% trans "Your Spotify Wrap History" %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -65,20 +66,20 @@
 
 {% block content %}
 <div class="history-container">
-    <h2>Your Spotify Wrap History</h2>
-    <p>Select a wrap to replay your Spotify journey.</p>
+    <h2>{% trans "Your Spotify Wrap History" %}</h2>
+    <p>{% trans "Select a wrap to replay your Spotify journey." %}</p>
     <div class="wrap-list">
         {% for wrap in wraps %}
         <div class="wrap-item">
             <div>
-                <p class="wrap-title">Wrap from {{ wrap.created_at|date:"F j, Y" }}</p>
-                <p class="wrap-date">Created at: {{ wrap.created_at|date:"g:i A" }}</p>
+                <p class="wrap-title">{% trans "Wrap from" %} {{ wrap.created_at|date:"F j, Y" }}</p>
+                <p class="wrap-date">{% trans "Created at:" %} {{ wrap.created_at|date:"g:i A" }}</p>
             </div>
-            <a href="{% url 'replay_wrap' wrap.id %}" class="replay-btn">Replay</a>
+            <a href="{% url 'replay_wrap' wrap.id %}" class="replay-btn">{% trans "Replay" %}</a>
         </div>
         {% endfor %}
         {% if wraps|length == 0 %}
-        <p>You have not generated any wraps yet.</p>
+        <p>{% trans "You have not generated any wraps yet." %}</p>
         {% endif %}
     </div>
 </div>
