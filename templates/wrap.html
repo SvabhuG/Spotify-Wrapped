@@ -175,6 +175,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-wrap: wrap; /* Allow items to wrap to the next line if needed */
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         border-radius: 0 0 10px 10px;
         font-size: 1.2em;
@@ -198,6 +199,12 @@
     }
 
     /* Language Switcher Styles */
+    .language-switcher {
+        display: flex;
+        align-items: center;
+        margin-left: 1em;
+    }
+
     .language-switcher select,
     .language-switcher button {
         background: #1DB954;
@@ -247,7 +254,7 @@
         <div class="card-grid">
             {% for track in wrap_data.top_tracks %}
                 <div class="card">
-                    {% blocktrans %}{{ track.name }} by {{ track.artist }}{% endblocktrans %}
+                    {{ track.name }} by {{ track.artist }}
                 </div>
             {% endfor %}
         </div>
@@ -273,7 +280,7 @@
         <div class="card-grid">
             {% for item in wrap_data.recently_played %}
                 <div class="card">
-                    {% blocktrans %}{{ item.track }} by {{ item.artist }}{% endblocktrans %}
+                    {{ item.track }} by {{ item.artist }}
                 </div>
             {% endfor %}
         </div>
