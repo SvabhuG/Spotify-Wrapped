@@ -24,7 +24,6 @@ SPOTIPY_REDIRECT_URI = os.getenv("SPOTIPY_REDIRECT_URI")
 # Django Allauth settings
 SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = "none"  # Or "mandatory" for email verification
-<<<<<<< HEAD
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
