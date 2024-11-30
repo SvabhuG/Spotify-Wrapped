@@ -13,7 +13,8 @@ def get_spotify_oauth():
         client_id=settings.SPOTIPY_CLIENT_ID,
         client_secret=settings.SPOTIPY_CLIENT_SECRET,
         redirect_uri=settings.SPOTIPY_REDIRECT_URI,
-        scope="user-top-read user-read-recently-played"
+        scope="user-top-read user-read-recently-played",
+        cache_path=None  # Disable cache file usage
     )
 
 
