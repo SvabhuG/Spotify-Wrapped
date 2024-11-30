@@ -1,6 +1,5 @@
-from django.db import models
+# models.py
 
-# Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -9,6 +8,10 @@ class SpotifyProfile(models.Model):
     spotify_id = models.CharField(max_length=50, unique=True)
     access_token = models.TextField()
     refresh_token = models.TextField()
+    expires_at = models.IntegerField(null=True, blank=True)  # New field added
+
+    def __str__(self):
+        return f"{self.user.username}'s Spotify Profile"
 
 class SpotifyWrap(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -252,6 +252,22 @@
             height: 10px;
         }
     }
+
+    /* Message Container for Reauthentication */
+    .message-container {
+        max-width: 800px;
+        margin: 2em auto;
+        text-align: center;
+        background: #191414;
+        padding: 2em;
+        border-radius: 15px;
+        color: #ffffff;
+    }
+
+    .message-container p {
+        font-size: 1.2em;
+        margin-bottom: 1.5em;
+    }
 </style>
 {% endblock %}
 
@@ -276,119 +292,135 @@
     </form>
 </div>
 
-<div class="slider-container">
-    <!-- Slide 1: Your Top Tracks -->
-    <div class="slide active">
-        <h2>{% trans "Your Top Tracks" %}</h2>
-        <div class="card-grid">
-            {% for track in wrap_data.top_tracks %}
-                <div class="card">
-                    <strong>{{ track.name }}</strong><br>
-                    {% trans "by" %} {{ track.artist }}
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    <!-- Slide 2: Your Top Artists -->
-    <div class="slide">
-        <h2>{% trans "Your Top Artists" %}</h2>
-        <div class="card-grid">
-            {% for artist in wrap_data.top_artists %}
-                <div class="card">
-                    <strong>{{ artist.name }}</strong>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    <!-- Slide 3: Your Top Genres -->
-    <div class="slide">
-        <h2>{% trans "Your Top Genres" %}</h2>
-        <div class="card-grid">
-            {% for genre in wrap_data.top_genres %}
-                <div class="card">{{ genre }}</div>
-            {% endfor %}
-        </div>
-    </div>
-    <!-- Slide 4: Recently Played Tracks -->
-    <div class="slide">
-        <h2>{% trans "Recently Played Tracks" %}</h2>
-        <div class="card-grid">
-            {% for item in wrap_data.recently_played %}
-                <div class="card">
-                    <strong>{{ item.track }}</strong><br>
-                    {% trans "by" %} {{ item.artist }}
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    <!-- Slide 5: Your Favorite Album -->
-    <div class="slide">
-        <h2>{% trans "Your Favorite Album" %}</h2>
-        <div class="card-grid">
-            <div class="card">
-                <strong>{{ wrap_data.favorite_album.name }}</strong><br>
-                {% trans "by" %} {{ wrap_data.favorite_album.artist }}<br>
-                {% trans "Total Plays:" %} {{ wrap_data.favorite_album.play_count }}
+{% if wrap_data %}
+    <div class="slider-container">
+        <!-- Slide 1: Your Top Tracks -->
+        <div class="slide active">
+            <h2>{% trans "Your Top Tracks" %}</h2>
+            <div class="card-grid">
+                {% for track in wrap_data.top_tracks %}
+                    <div class="card">
+                        <strong>{{ track.name }}</strong><br>
+                        {% trans "by" %} {{ track.artist }}
+                    </div>
+                {% endfor %}
             </div>
         </div>
-    </div>
-    <!-- Slide 6: Your Listening Habits -->
-    <div class="slide">
-        <h2>{% trans "Your Listening Habits" %}</h2>
-        <div class="card-grid">
-            <div class="card">
-                {% trans "Total Minutes Listened:" %} {{ wrap_data.total_minutes }}
-            </div>
-            <div class="card">
-                {% trans "Total Songs Played:" %} {{ wrap_data.total_tracks }}
-            </div>
-            <div class="card">
-                {% trans "Average Song Duration:" %} {{ wrap_data.average_song_duration }} {% trans "minutes" %}
-            </div>
-        </div>
-    </div>
-    <!-- Slide 7: Your Audio Aura -->
-    <div class="slide">
-        <h2>{% trans "Your Audio Aura" %}</h2>
-        <div class="card-grid">
-            <div class="card">
-                {% trans "Energy Level:" %} {{ wrap_data.audio_features.energy }}%
-            </div>
-            <div class="card">
-                {% trans "Danceability:" %} {{ wrap_data.audio_features.danceability }}%
-            </div>
-            <div class="card">
-                {% trans "Acousticness:" %} {{ wrap_data.audio_features.acousticness }}%
-            </div>
-            <div class="card">
-                {% trans "Valence (Positivity):" %} {{ wrap_data.audio_features.valence }}%
-            </div>
-        </div>
-    </div>
-    <!-- Slide 8: Your Top Podcasts -->
-    <div class="slide">
-        <h2>{% trans "Your Top Podcasts" %}</h2>
-        <div class="card-grid">
-            {% for podcast in wrap_data.top_podcasts %}
-                <div class="card">
-                    <strong>{{ podcast.name }}</strong><br>
-                    {% trans "Episodes Listened:" %} {{ podcast.episodes_listened }}
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    <!-- Slide Indicators -->
-    <div class="slide-indicators"></div>
-</div>
 
-<div class="navigation">
-    <button id="prev-slide" class="nav-button">{% trans "Previous" %}</button>
-    <button id="next-slide" class="nav-button">{% trans "Next" %}</button>
-</div>
+        <!-- Slide 2: Track Trivia -->
+        <div class="slide">
+            <h2>{% trans "Track Trivia" %}</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <strong>{% trans "Total Tracks Analyzed" %}</strong><br>
+                    {{ wrap_data.listening_stats.total_tracks_analyzed }}
+                </div>
+                <div class="card">
+                    <strong>{% trans "Average Track Popularity" %}</strong><br>
+                    {{ wrap_data.listening_stats.tracks_average_popularity }}%
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Your Top Artists -->
+        <div class="slide">
+            <h2>{% trans "Your Top Artists" %}</h2>
+            <div class="card-grid">
+                {% for artist in wrap_data.top_artists %}
+                    <div class="card">
+                        <strong>{{ artist.name }}</strong><br>
+                        {% if artist.genres %}
+                            {% trans "Genres:" %} {{ artist.genres|join:", " }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Slide 4: Artists Trivia -->
+        <div class="slide">
+            <h2>{% trans "Artist Insights" %}</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <strong>{% trans "Diverse Genres" %}</strong><br>
+                    {% with genres=wrap_data.top_artists|dictsort:"genres"|slice:":3" %}
+                        {% for artist in genres %}
+                            {{ artist.genres|first }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Recently Played Tracks -->
+        <div class="slide">
+            <h2>{% trans "Recently Played Tracks" %}</h2>
+            <div class="card-grid">
+                {% for item in wrap_data.recently_played %}
+                    <div class="card">
+                        <strong>{{ item.track }}</strong><br>
+                        {% trans "by" %} {{ item.artist }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Slide 6: Recent Tracks Trivia -->
+        <div class="slide">
+            <h2>{% trans "Recent Tracks Insights" %}</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <strong>{% trans "Total Recent Tracks" %}</strong><br>
+                    {{ wrap_data.recently_played|length }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Mix Insights -->
+        <div class="slide">
+            <h2>{% trans "Your Musical Mix" %}</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <strong>{% trans "Unique Artists" %}</strong><br>
+                    {{ wrap_data.top_artists|length }}
+                </div>
+                <div class="card">
+                    <strong>{% trans "Unique Tracks" %}</strong><br>
+                    {{ wrap_data.top_tracks|length }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Thank You -->
+        <div class="slide">
+            <h2>{% trans "Your Musical Journey" %}</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <strong>{% trans "Thanks for Listening!" %}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide Indicators -->
+        <div class="slide-indicators"></div>
+    </div>
+
+    <div class="navigation">
+        <button id="prev-slide" class="nav-button">{% trans "Previous" %}</button>
+        <button id="next-slide" class="nav-button">{% trans "Next" %}</button>
+    </div>
+{% else %}
+    <!-- Message to prompt reauthentication -->
+    <div class="message-container">
+        <p>{% trans "Your Spotify session has expired or needs to be refreshed. Please reconnect your Spotify account." %}</p>
+        <a href="{% url 'spotify_connect' %}" class="nav-button">{% trans "Connect to Spotify" %}</a>
+    </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    {% if wrap_data %}
     document.addEventListener("DOMContentLoaded", function () {
         const slides = document.querySelectorAll('.slide');
         const indicatorsContainer = document.querySelector('.slide-indicators');
@@ -456,5 +488,6 @@
         // Initial load
         showSlide(currentSlide);
     });
+    {% endif %}
 </script>
 {% endblock %}

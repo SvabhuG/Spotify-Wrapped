@@ -3,165 +3,204 @@ from django.contrib.auth.decorators import login_required
 from .models import SpotifyProfile, SpotifyWrap
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
+from spotipy.exceptions import SpotifyException
 from django.conf import settings
-from datetime import timedelta
-import time
+import time  # For token expiration handling
 
-# Configure SpotifyOAuth for authentication and data access
-sp_oauth = SpotifyOAuth(
-    client_id=settings.SPOTIPY_CLIENT_ID,
-    client_secret=settings.SPOTIPY_CLIENT_SECRET,
-    redirect_uri=settings.SPOTIPY_REDIRECT_URI,
-    scope="user-top-read user-read-recently-played user-library-read user-read-playback-position"
-)
+
+def get_spotify_oauth():
+    return SpotifyOAuth(
+        client_id=settings.SPOTIPY_CLIENT_ID,
+        client_secret=settings.SPOTIPY_CLIENT_SECRET,
+        redirect_uri=settings.SPOTIPY_REDIRECT_URI,
+        scope="user-top-read user-read-recently-played"
+    )
+
+
+def is_token_expired(profile):
+    if not profile.expires_at:
+        # `expires_at` is missing; consider the token expired
+        return True
+    now = int(time.time())
+    return profile.expires_at - now < 60  # Consider expired if less than 1 minute remains
+
+
+def refresh_spotify_token(profile):
+    sp_oauth = get_spotify_oauth()
+    try:
+        token_info = sp_oauth.refresh_access_token(profile.refresh_token)
+        profile.access_token = token_info['access_token']
+        if 'refresh_token' in token_info:
+            profile.refresh_token = token_info['refresh_token']
+        profile.expires_at = token_info['expires_at']
+        profile.save()
+        return True
+    except Exception as e:
+        print(f"Error refreshing token: {e}")
+        return False
+
 
 @login_required
 def spotify_connect(request):
+    sp_oauth = get_spotify_oauth()
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
+
 
 @login_required
 def spotify_callback(request):
     code = request.GET.get('code')
+    sp_oauth = get_spotify_oauth()
     token_info = sp_oauth.get_access_token(code)
+    print("Received token_info:", token_info)
 
     if token_info:
         sp = Spotify(auth=token_info['access_token'])
-        spotify_id = sp.current_user()['id']
+        spotify_user = sp.current_user()
+        spotify_id = spotify_user['id']
+        print("Authenticated Spotify user ID:", spotify_id)
 
-        # Save or update the user's Spotify profile
-        profile, created = SpotifyProfile.objects.get_or_create(
-            user=request.user,
-            defaults={
-                'spotify_id': spotify_id,
-                'access_token': token_info['access_token'],
-                'refresh_token': token_info['refresh_token']
-            }
-        )
-
-        if not created:
-            profile.access_token = token_info['access_token']
-            profile.refresh_token = token_info['refresh_token']
-            profile.save()
+        try:
+            # Check if a SpotifyProfile with this spotify_id already exists
+            profile = SpotifyProfile.objects.get(spotify_id=spotify_id)
+            if profile.user != request.user:
+                # The Spotify account is already linked to another user
+                print("Spotify account is already linked to another user.")
+                return render(request, 'error.html', {
+                    'message': 'This Spotify account is already linked to another user.'
+                })
+            else:
+                # Update the existing profile
+                print("Updating existing SpotifyProfile for the same user.")
+                profile.access_token = token_info['access_token']
+                profile.refresh_token = token_info['refresh_token']
+                profile.expires_at = token_info['expires_at']
+                profile.save()
+                print("SpotifyProfile updated successfully.")
+        except SpotifyProfile.DoesNotExist:
+            # Create a new profile
+            print("Creating new SpotifyProfile.")
+            profile = SpotifyProfile.objects.create(
+                user=request.user,
+                spotify_id=spotify_id,
+                access_token=token_info['access_token'],
+                refresh_token=token_info['refresh_token'],
+                expires_at=token_info['expires_at']
+            )
+            print("SpotifyProfile created successfully.")
 
         return redirect('generate_wrap')
 
-    return render(request, 'error.html')
+    print("Failed to obtain token_info.")
+    return render(request, 'error.html', {'message': 'Failed to obtain token information from Spotify.'})
+
 
 @login_required
 def generate_wrap(request):
     profile = SpotifyProfile.objects.get(user=request.user)
+
+    # Check if access token is expired or expires_at is missing
+    if is_token_expired(profile):
+        refreshed = refresh_spotify_token(profile)
+        if not refreshed:
+            # Redirect to reauthenticate
+            return redirect('spotify_connect')
+
     sp = Spotify(auth=profile.access_token)
 
     # Fetch user data from Spotify
-    top_tracks_data = sp.current_user_top_tracks(limit=10, time_range="long_term")['items']
-    top_artists_data = sp.current_user_top_artists(limit=5, time_range="long_term")['items']
-    top_genres = list(set(genre for artist in top_artists_data for genre in artist['genres']))
-    recently_played_data = sp.current_user_recently_played(limit=10)['items']
+    try:
+        # Fetch top tracks - reduced limit due to API constraints
+        top_tracks_data = sp.current_user_top_tracks(limit=5, time_range="medium_term")['items']
 
-    # Fetch favorite album
-    favorite_albums = sp.current_user_saved_albums(limit=50)['items']
-    album_play_counts = {}
+        # Fetch top artists - reduced limit
+        top_artists_data = sp.current_user_top_artists(limit=5, time_range="medium_term")['items']
 
-    for album_item in favorite_albums:
-        album = album_item['album']
-        album_tracks = album['tracks']['items']
-        play_count = 0
-        for track in album_tracks:
-            track_id = track['id']
-            # Assume we have a way to get play count per track (Note: Spotify API does not provide this directly)
-            # For demo purposes, we'll simulate play counts
-            play_count += 1  # Replace with actual play count retrieval if possible
-        album_play_counts[album['id']] = {
-            'name': album['name'],
-            'artist': album['artists'][0]['name'],
-            'play_count': play_count
+        # Recently played tracks
+        recently_played_data = sp.current_user_recently_played(limit=10)['items']
+
+        # Calculate basic listening stats
+        total_tracks = len(top_tracks_data)
+
+        # Prepare data for the wrap
+        wrap_data = {
+            "top_tracks": [
+                {
+                    "name": track['name'],
+                    "artist": track['artists'][0]['name']
+                } for track in top_tracks_data
+            ],
+            "top_artists": [
+                {
+                    "name": artist['name'],
+                    "genres": artist.get('genres', [])[:2]  # Take first 2 genres
+                } for artist in top_artists_data
+            ],
+            "recently_played": [
+                {
+                    "track": item['track']['name'],
+                    "artist": item['track']['artists'][0]['name']
+                } for item in recently_played_data
+            ],
+            "listening_stats": {
+                "total_tracks_analyzed": total_tracks,
+                "tracks_average_popularity": round(
+                    sum(track.get('popularity', 0) for track in top_tracks_data) / total_tracks
+                    if total_tracks > 0 else 0,
+                    2
+                )
+            }
         }
 
-    # Find the album with the highest play count
-    favorite_album = max(album_play_counts.values(), key=lambda x: x['play_count']) if album_play_counts else None
+        # Save the wrap data to the database
+        wrap = SpotifyWrap(user=request.user, data=wrap_data)
+        wrap.save()
 
-    # Calculate listening habits
-    total_minutes = 0
-    total_tracks = 0
-    total_duration_ms = 0
-
-    all_tracks = sp.current_user_top_tracks(limit=50, time_range="long_term")['items']
-    for track in all_tracks:
-        total_tracks += 1
-        total_duration_ms += track['duration_ms']
-
-    total_minutes = int(total_duration_ms / (1000 * 60))
-    average_song_duration = round((total_duration_ms / total_tracks) / (1000 * 60), 2) if total_tracks > 0 else 0
-
-    # Get audio features
-    track_ids = [track['id'] for track in all_tracks]
-    audio_features_list = sp.audio_features(tracks=track_ids)
-    energy = danceability = acousticness = valence = 0
-    feature_count = 0
-
-    for features in audio_features_list:
-        if features:
-            energy += features['energy']
-            danceability += features['danceability']
-            acousticness += features['acousticness']
-            valence += features['valence']
-            feature_count += 1
-
-    if feature_count > 0:
-        energy = int((energy / feature_count) * 100)
-        danceability = int((danceability / feature_count) * 100)
-        acousticness = int((acousticness / feature_count) * 100)
-        valence = int((valence / feature_count) * 100)
-    else:
-        energy = danceability = acousticness = valence = 0
-
-    # Fetch top podcasts
-    top_podcasts_data = sp.current_user_saved_shows(limit=5)['items']
-    top_podcasts = []
-    for item in top_podcasts_data:
-        show = item['show']
-        episodes_listened = 0  # Since Spotify API does not provide this, we can simulate or omit
-        top_podcasts.append({
-            'name': show['name'],
-            'episodes_listened': episodes_listened  # Replace with actual data if available
-        })
-
-    # Prepare data for the wrap
-    wrap_data = {
-        "top_tracks": [{"name": track['name'], "artist": track['artists'][0]['name']} for track in top_tracks_data],
-        "top_artists": [{"name": artist['name']} for artist in top_artists_data],
-        "top_genres": top_genres,
-        "recently_played": [
-            {"track": item['track']['name'], "artist": item['track']['artists'][0]['name']}
-            for item in recently_played_data
-        ],
-        "favorite_album": favorite_album,
-        "total_minutes": total_minutes,
-        "total_tracks": total_tracks,
-        "average_song_duration": average_song_duration,
-        "audio_features": {
-            "energy": energy,
-            "danceability": danceability,
-            "acousticness": acousticness,
-            "valence": valence
-        },
-        "top_podcasts": top_podcasts
-    }
-
-    # Save the wrap data to the database
-    wrap = SpotifyWrap(user=request.user, data=wrap_data)
-    wrap.save()
+    except SpotifyException as e:
+        if e.http_status == 401:
+            # Token is invalid or expired
+            refreshed = refresh_spotify_token(profile)
+            if refreshed:
+                sp = Spotify(auth=profile.access_token)
+                # Retry fetching data or redirect as needed
+                return redirect('generate_wrap')  # Retry the view
+            else:
+                return redirect('spotify_connect')
+        else:
+            print(f"Spotify API error: {e}")
+            return render(request, 'error.html')
 
     return render(request, 'wrap.html', {'wrap_data': wrap_data})
 
+
 @login_required
 def wrap_history(request):
+    profile = SpotifyProfile.objects.filter(user=request.user).first()
+    if not profile:
+        return redirect('spotify_connect')
+
+    # Check if access token is expired or expires_at is missing
+    if is_token_expired(profile):
+        refreshed = refresh_spotify_token(profile)
+        if not refreshed:
+            return redirect('spotify_connect')
+
     wraps = SpotifyWrap.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'history.html', {'wraps': wraps})
 
+
 @login_required
 def replay_wrap(request, wrap_id):
+    profile = SpotifyProfile.objects.filter(user=request.user).first()
+    if not profile:
+        return redirect('spotify_connect')
+
+    # Check if access token is expired or expires_at is missing
+    if is_token_expired(profile):
+        refreshed = refresh_spotify_token(profile)
+        if not refreshed:
+            return redirect('spotify_connect')
+
     wrap = get_object_or_404(SpotifyWrap, id=wrap_id, user=request.user)
-    wrap_data = wrap.data  # Access the saved wrap data
+    wrap_data = wrap.data
     return render(request, 'wrap.html', {'wrap_data': wrap_data})
