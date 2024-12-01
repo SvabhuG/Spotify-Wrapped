@@ -149,19 +149,28 @@ def generate_wrap(request):
     try:
         # Fetch user profile
         user_profile = sp.current_user()
-        print("Full User Profile:", user_profile)
-
-        # Extract username
         spotify_username = user_profile.get('display_name', 'Spotify User')
-        print("Extracted Username:", spotify_username)
 
         # Fetch user data from Spotify
         top_artists = get_user_top_artists(access_token)
         top_tracks = get_user_top_tracks(access_token)
-        recently_played = get_recently_played(access_token)
+
+        # Process recently played tracks
+        recently_played_raw = get_recently_played(access_token)
+        recently_played = [
+            {
+                'track': item['track']['name'],
+                'artist': ', '.join(artist['name'] for artist in item['track']['artists']),
+                'album_name': item['track']['album']['name'],
+                'album_cover': item['track']['album']['images'][0]['url'] if item['track']['album']['images'] else None,
+                'played_at': item['played_at'],
+            }
+            for item in recently_played_raw.get('items', [])
+        ]
+
         followed_artists = get_user_followed_artists(access_token)
 
-        # Pass data to the template
+        # Prepare wrap data
         wrap_data = {
             'spotify_username': spotify_username,
             'top_artists': top_artists,
@@ -170,11 +179,19 @@ def generate_wrap(request):
             'followed_artists': followed_artists,
         }
 
-        return render(request, 'spotify_wrap.html', {'wrap_data': wrap_data})
+        # Save wrap to the database
+        SpotifyWrap.objects.create(
+            user=request.user,
+            data=wrap_data  # Ensure data is JSON-serializable
+        )
+
+        # Pass data to the template
+        return render(request, 'wrap.html', {'wrap_data': wrap_data})
 
     except SpotifyException as e:
         print(f"Spotify API Error: {e}")
         return redirect('spotify_connect')
+
 
 @login_required
 def wrap_history(request):

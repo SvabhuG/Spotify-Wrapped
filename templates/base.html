@@ -114,6 +114,7 @@
         <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
         <nav id="nav-menu">
             <a href="{% url 'wrap_history' %}">{% trans "Home" %}</a>
+            <a href="{% url 'generate_wrap' %}">{% trans "Generate" %}</a>
             {% if user.is_authenticated %}
                 <a href="{% url 'account_logout' %}">{% trans "Logout" %}</a>
             {% else %}
@@ -144,3 +145,4 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
+
