@@ -157,15 +157,26 @@ def generate_wrap(request):
 
         # Process recently played tracks
         recently_played_raw = get_recently_played(access_token)
+
+        # Handle recently_played_raw depending on its type
+        if isinstance(recently_played_raw, dict):
+            recently_played_items = recently_played_raw.get('items', [])
+        elif isinstance(recently_played_raw, list):
+            recently_played_items = recently_played_raw
+        else:
+            recently_played_items = []
+
+        # Extract track details
         recently_played = [
             {
                 'track': item['track']['name'],
                 'artist': ', '.join(artist['name'] for artist in item['track']['artists']),
                 'album_name': item['track']['album']['name'],
-                'album_cover': item['track']['album']['images'][0]['url'] if item['track']['album']['images'] else None,
+                'album_cover': item['track']['album']['images'][0]['url']
+                if item['track']['album']['images'] else None,
                 'played_at': item['played_at'],
             }
-            for item in recently_played_raw.get('items', [])
+            for item in recently_played_items
         ]
 
         followed_artists = get_user_followed_artists(access_token)
@@ -190,6 +201,10 @@ def generate_wrap(request):
 
     except SpotifyException as e:
         print(f"Spotify API Error: {e}")
+        return redirect('spotify_connect')
+
+    except Exception as e:
+        print(f"Unexpected error: {e}")
         return redirect('spotify_connect')
 
 
