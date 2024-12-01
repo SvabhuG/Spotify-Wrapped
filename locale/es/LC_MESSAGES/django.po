@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-28 21:03-0500\n"
+"POT-Creation-Date: 2024-12-01 03:41-0500\n"
 "PO-Revision-Date: 2024-11-29 02:00+0000\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: Spanish <LL@li.org>\n"
@@ -14,89 +14,123 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: templates/base.html:8
+#: templates/base.html:9 templates/base.html:112
 msgid "My Spotify Wrap"
 msgstr "Mi Spotify Wrap"
 
-#: templates/base.html:19
+#: templates/base.html:116
 msgid "Home"
 msgstr "Inicio"
 
-#: templates/base.html:21
+#: templates/base.html:118
 msgid "Logout"
 msgstr "Cerrar sesión"
 
-#: templates/base.html:23
+#: templates/base.html:120
 msgid "Login"
 msgstr "Iniciar sesión"
 
-#: templates/base.html:24
+#: templates/base.html:121
 msgid "Sign Up"
 msgstr "Registrarse"
 
-#: templates/base.html:34
+#: templates/base.html:133
 msgid "My Spotify Wrap. All rights reserved."
 msgstr "Mi Spotify Wrap. Todos los derechos reservados."
 
-#: templates/history.html:4 templates/history.html:9 templates/history.html:69
+#: templates/history.html:4 templates/history.html:69
 msgid "Your Spotify Wrap History"
 msgstr "Tu historial de Spotify Wrap"
 
-#: templates/history.html:11 templates/history.html:70
+#: templates/history.html:70
 msgid "Select a wrap to replay your Spotify journey."
 msgstr "Selecciona un wrap para revivir tu experiencia en Spotify."
 
-#: templates/history.html:18 templates/history.html:75
+#: templates/history.html:75
 msgid "Wrap from"
 msgstr "Wrap de"
 
-#: templates/history.html:19 templates/history.html:76
+#: templates/history.html:76
 msgid "Created at:"
 msgstr "Creado a las:"
 
-#: templates/history.html:22 templates/history.html:78
+#: templates/history.html:78
 msgid "Replay"
 msgstr "Reproducir"
 
-#: templates/history.html:26 templates/history.html:82
+#: templates/history.html:82
 msgid "You have not generated any wraps yet."
 msgstr "No has generado ningún wrap todavía."
 
-#: templates/wrap.html:4 templates/wrap.html:232
+#: templates/wrap.html:4 templates/wrap.html:559
 msgid "Your Spotify Wrapped"
 msgstr "Tu Spotify Wrapped"
 
-#: templates/wrap.html:233
+#: templates/wrap.html:560 templates/wrap.html:738
 msgid "Toggle Dark Mode"
 msgstr "Alternar Modo Oscuro"
 
-#: templates/wrap.html:247
+#: templates/wrap.html:574
 msgid "Switch Language"
 msgstr "Cambiar Idioma"
 
-#: templates/wrap.html:253
-msgid "Your Top Tracks"
-msgstr "Tus Mejores Canciones"
+#: templates/wrap.html:582
+msgid "Welcome, Your Musical Journey Begins"
+msgstr ""
 
-#: templates/wrap.html:263
+#: templates/wrap.html:590
+#, fuzzy
+#| msgid "Your Top Genres"
+msgid "Your Top Songs"
+msgstr "Tus Géneros Principales"
+
+#: templates/wrap.html:606 templates/wrap.html:649
+msgid "by"
+msgstr ""
+
+#: templates/wrap.html:613
 msgid "Your Top Artists"
 msgstr "Tus Artistas Principales"
 
-#: templates/wrap.html:271
-msgid "Your Top Genres"
-msgstr "Tus Géneros Principales"
-
-#: templates/wrap.html:279
+#: templates/wrap.html:637
 msgid "Recently Played Tracks"
 msgstr "Canciones Reproducidas Recientemente"
 
-#: templates/wrap.html:292
+#: templates/wrap.html:657
+
+#: templates/wrap.html:665
 msgid "Previous"
 msgstr "Anterior"
 
-#: templates/wrap.html:293
+#: templates/wrap.html:666
 msgid "Next"
 msgstr "Siguiente"
+
+#: templates/wrap.html:671
+msgid ""
+"Your Spotify session has expired or needs to be refreshed. Please reconnect "
+"your Spotify account."
+msgstr ""
+
+#: templates/wrap.html:672
+msgid "Connect to Spotify"
+msgstr ""
+
+#: templates/wrap.html:737
+#, fuzzy
+#| msgid "Toggle Dark Mode"
+msgid "Toggle Light Mode"
+msgstr "Alternar Modo Oscuro"
+
+msgid "Welcome, Your Musical Journey Begins!"
+msgstr "¡Bienvenido, comienza tu viaje musical!"
+
+msgid "Thanks For Stopping By!"
+msgstr "¡Gracias por pasar por aquí!"
+
+
+#~ msgid "Your Top Tracks"
+#~ msgstr "Tus Mejores Canciones"
 
 # Obsolete messages
 #~ msgid "%(track_name)s by %(artist_name)s"

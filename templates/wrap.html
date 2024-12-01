@@ -7,14 +7,31 @@
 <style>
     /* Background for the entire page */
     body {
-        background: linear-gradient(135deg, #1DB954, #191414);
-        color: #ffffff;
+        background: linear-gradient(135deg, #1DB954,#f5f5f5); /* Light mode background */
+        color: #191414;
     }
 
     /* Dark Mode Styles */
     body.dark-mode {
-        background: linear-gradient(135deg, #191414, #1DB954);
+        background: linear-gradient(135deg, #191414, #1DB954); /* Dark mode background */
         color: #cccccc;
+    }
+
+    /* Slider Container (white by default, black in dark mode) */
+    .slider-container {
+        position: relative;
+        max-width: 900px;
+        margin: 2em auto;
+        overflow: hidden;
+        background: #ffffff; /* White by default */
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        padding: 2em;
+        min-height: 450px;
+    }
+
+    body.dark-mode .slider-container {
+        background: #191414; /* Black in dark mode */
     }
 
     /* Slider Container */
@@ -29,6 +46,272 @@
         padding: 2em;
         min-height: 450px;
     }
+
+/* Top Songs Slide Container */
+.top-songs-slide {
+    position: relative;
+    height: 100%; /* Full height of the slide */
+    opacity: 0;   /* Hidden initially */
+    animation: fadeIn 2s ease-in-out forwards; /* Fade-in animation */
+    z-index: 1;
+}
+
+/* Glowing effect by default on active slide (reduced glow) */
+.top-songs-slide.active {
+    box-shadow: 0 0 10px 3px rgba(29, 185, 84, 0.6); /* Reduced glow */
+    opacity: 1; /* Ensure active slide is visible */
+    z-index: 10; /* Bring the active slide on top */
+}
+
+/* Title Styling - Centered Padding and Positioning */
+.top-songs-slide h2 {
+    font-size: 4.5rem !important; /* Larger font size */
+    text-shadow: 0 0 5px #1DB954, 0 0 15px #1DB954, 0 0 25px #1DB954; /* Glowing effect */
+    padding: 20px; /* You can manually adjust this for top, right, bottom, left padding */
+    margin: 0; /* Remove default margin */
+    position: absolute; /* Absolute positioning for manual placement */
+    top: 50%;  /* Center the text vertically - you can adjust this */
+    left: 50%; /* Center the text horizontally - you can adjust this */
+    transform: translate(-50%, -50%); /* Fine-tune the centering */
+    width: auto; /* Width will be based on the content */
+    text-align: center; /* Keep text centered */
+}
+
+/* Optional: Add a subtle zoom effect to images or elements inside the slide */
+.top-songs-slide img {
+    transition: transform 0.3s ease-in-out;
+}
+
+.top-songs-slide img:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+/* Style for inactive slides to ensure they stay hidden */
+.slide {
+    display: none; /* Hide all slides by default */
+}
+
+.slide.active {
+    display: block; /* Only display the active slide */
+}
+
+/* Cool fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Top Artists Slide Container */
+.top-artists-slide {
+    position: relative;
+    height: 100%; /* Full height of the slide */
+    opacity: 0;   /* Hidden initially */
+    animation: fadeIn 2s ease-in-out forwards; /* Fade-in animation */
+    z-index: 1;
+}
+
+/* Glowing effect by default on active slide (reduced glow) */
+.top-artists-slide.active {
+    box-shadow: 0 0 10px 3px rgba(29, 185, 84, 0.6); /* Reduced glow */
+    opacity: 1; /* Ensure active slide is visible */
+    z-index: 10; /* Bring the active slide on top */
+}
+
+/* Title Styling - Centered Padding and Positioning for "Your Top Artists" */
+.top-artists-slide h2 {
+    font-size: 4.5rem !important; /* Larger font size */
+    text-shadow: 0 0 5px #1DB954, 0 0 15px #1DB954, 0 0 25px #1DB954; /* Glowing effect */
+    padding: 20px; /* You can manually adjust this for top, right, bottom, left padding */
+    margin: 0; /* Remove default margin */
+    position: absolute; /* Absolute positioning for manual placement */
+    top: 50%;  /* Center the text vertically - you can adjust this */
+    left: 50%; /* Center the text horizontally - you can adjust this */
+    transform: translate(-50%, -50%); /* Fine-tune the centering */
+    width: auto; /* Width will be based on the content */
+    text-align: center; /* Keep text centered */
+}
+
+/* Optional: Add a subtle zoom effect to images or elements inside the slide */
+.top-artists-slide img {
+    transition: transform 0.3s ease-in-out;
+}
+
+.top-artists-slide img:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+/* Style for inactive slides to ensure they stay hidden */
+.slide {
+    display: none; /* Hide all slides by default */
+}
+
+.slide.active {
+    display: block; /* Only display the active slide */
+}
+
+/* Cool fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Recently Played Tracks Slide Container */
+.recently-played-tracks-slide {
+    position: relative;
+    height: 100%; /* Full height of the slide */
+    opacity: 0;   /* Hidden initially */
+    animation: fadeIn 2s ease-in-out forwards; /* Fade-in animation */
+    z-index: 1;
+}
+
+/* Glowing effect by default on active slide (reduced glow) */
+.recently-played-tracks-slide.active {
+    box-shadow: 0 0 10px 3px rgba(29, 185, 84, 0.6); /* Reduced glow */
+    opacity: 1; /* Ensure active slide is visible */
+    z-index: 10; /* Bring the active slide on top */
+}
+
+/* Title Styling - Centered Padding and Positioning for "Recently Played Tracks" */
+.recently-played-tracks-slide h2 {
+    font-size: 4.5rem !important; /* Larger font size */
+    text-shadow: 0 0 5px #1DB954, 0 0 15px #1DB954, 0 0 25px #1DB954; /* Glowing effect */
+    padding: 20px; /* You can manually adjust this for top, right, bottom, left padding */
+    margin: 0; /* Remove default margin */
+    position: absolute; /* Absolute positioning for manual placement */
+    top: 50%;  /* Center the text vertically */
+    left: 50%; /* Center the text horizontally */
+    transform: translate(-50%, -50%); /* Fine-tune the centering */
+    width: auto; /* Width will be based on the content */
+    text-align: center; /* Keep text centered */
+}
+
+/* Style for inactive slides to ensure they stay hidden */
+.slide {
+    display: none; /* Hide all slides by default */
+}
+
+.slide.active {
+    display: block; /* Only display the active slide */
+}
+
+/* Cool fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+.welcome-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+     /* Gradient background */
+    color: white;
+    text-align: center;
+    animation: fadeIn 1.5s ease-in-out; /* Slide animation */
+}
+
+.welcome-heading {
+    position: absolute; /* Allows precise control */
+    top: 50%; /* Adjust vertical position manually */
+    left: 50%; /* Adjust horizontal position manually */
+    transform: translate(-50%, -50%); /* Centers the heading exactly (can be adjusted if needed) */
+    font-size: 3rem; /* Large, bold font */
+    font-weight: 700;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6); /* Shadow for better visibility */
+    letter-spacing: 2px; /* Adds spacing between letters */
+    margin: 0;
+    animation: pulse 2s infinite; /* Subtle glowing effect */
+}
+
+/* Animation for slide appearance */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px); /* Slight upward movement */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); /* Settles in place */
+    }
+}
+
+/* Animation for glowing text effect */
+@keyframes pulse {
+    0%, 100% {
+        text-shadow: 0 0 10px #1DB954, 0 0 20px #1DB954, 0 0 30px #1DB954;
+    }
+    50% {
+        text-shadow: 0 0 20px #1ed760, 0 0 40px #1ed760, 0 0 60px #1ed760;
+    }
+}
+
+/* Thank You Slide Styling */
+.thank-you-slide {
+    position: relative; /* Allows manual positioning of the content */
+    height: 100vh; /* Full viewport height */
+    color: white;
+    text-align: center;
+    animation: fadeIn 1.5s ease-in-out; /* Slide animation */
+}
+
+/* Manual positioning using offsets */
+.thank-you-heading {
+    position: absolute; /* Allows precise control */
+    top: 50%; /* Adjust vertical position manually */
+    left: 50%; /* Adjust horizontal position manually */
+    transform: translate(-50%, -50%); /* Centers the heading exactly (can be adjusted if needed) */
+    font-size: 3rem; /* Large, bold font */
+    font-weight: 700;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6); /* Shadow for better visibility */
+    letter-spacing: 2px; /* Adds spacing between letters */
+    margin: 0;
+    animation: pulse 2s infinite; /* Subtle glowing effect */
+}
+
+/* Animation for slide appearance */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px); /* Slight upward movement */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); /* Settles in place */
+    }
+}
+
+/* Animation for glowing text effect */
+@keyframes pulse {
+    0%, 100% {
+        text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff;
+    }
+    50% {
+        text-shadow: 0 0 20px #dddddd, 0 0 40px #dddddd, 0 0 60px #dddddd;
+    }
+}
+
+
+
 
     /* Slide Styling */
     .slide {
@@ -294,67 +577,71 @@
 
 {% if wrap_data %}
     <div class="slider-container">
+        <!-- New Welcome Slide -->
+        <div class="slide welcome-slide active">
+    <h2 class="welcome-heading">{% trans "Welcome, Your Musical Journey Begins" %}!</h2>
+</div>
+
+        <!-- Rest of the existing slides... -->
+
+
+    <!-- Slide 1: Top Artists -->
+<div class="slide top-songs-slide">
+    <h2 class="top-artists-title">{% trans "Your Top Songs" %}</h2>
+</div>
+
         <!-- Slide 1: Your Top Tracks -->
         <div class="slide active">
-            <h2>{% trans "Your Top Tracks" %}</h2>
-            <div class="card-grid">
-                {% for track in wrap_data.top_tracks %}
-                    <div class="card">
-                        <strong>{{ track.name }}</strong><br>
-                        {% trans "by" %} {{ track.artist }}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Slide 2: Track Trivia -->
-        <div class="slide">
-            <h2>{% trans "Track Trivia" %}</h2>
-            <div class="card-grid">
+        <div class="card-grid">
+            {% for track in wrap_data.top_tracks %}
                 <div class="card">
-                    <strong>{% trans "Total Tracks Analyzed" %}</strong><br>
-                    {{ wrap_data.listening_stats.total_tracks_analyzed }}
+                    {% if track.album_cover %}
+                        <img src="{{ track.album_cover }}" alt="{{ track.name }} Album Cover"
+                             style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 1em; object-fit: cover;">
+                    {% else %}
+                        <img src="/path/to/placeholder-image.jpg" alt="Placeholder Album Cover"
+                             style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 1em; object-fit: cover;">
+                    {% endif %}
+                    <strong>{{ track.name }}</strong><br>
+                    {% trans "by" %} {{ track.artist }}
                 </div>
-                <div class="card">
-                    <strong>{% trans "Average Track Popularity" %}</strong><br>
-                    {{ wrap_data.listening_stats.tracks_average_popularity }}%
-                </div>
-            </div>
+            {% endfor %}
         </div>
+    </div>
 
-        <!-- Slide 3: Your Top Artists -->
-        <div class="slide">
-            <h2>{% trans "Your Top Artists" %}</h2>
-            <div class="card-grid">
-                {% for artist in wrap_data.top_artists %}
-                    <div class="card">
-                        <strong>{{ artist.name }}</strong><br>
-                        {% if artist.genres %}
-                            {% trans "Genres:" %} {{ artist.genres|join:", " }}
-                        {% endif %}
-                    </div>
-                {% endfor %}
+    <div class="slide top-artists-slide">
+    <h2 class="top-artists-title">{% trans "Your Top Artists" %}</h2>
+    </div>
+
+
+
+        <!-- Slide 2: Your Top Artists -->
+        <div class="slide active">
+    <div class="card-grid">
+        {% for artist in wrap_data.top_artists %}
+            <div class="card">
+                {% if artist.profile_pic %}
+                    <img src="{{ artist.profile_pic }}" alt="{{ artist.name }} Profile Picture"
+                         style="width: 100%; height: auto; border-radius: 50%; margin-bottom: 1em; object-fit: cover;">
+                {% else %}
+                    <img src="/path/to/placeholder-image.jpg" alt="Placeholder Profile Picture"
+                         style="width: 100%; height: auto; border-radius: 50%; margin-bottom: 1em; object-fit: cover;">
+                {% endif %}
+                <strong>{{ artist.name }}</strong>
             </div>
-        </div>
+        {% endfor %}
+    </div>
+</div>
 
-        <!-- Slide 4: Artists Trivia -->
-        <div class="slide">
-            <h2>{% trans "Artist Insights" %}</h2>
-            <div class="card-grid">
-                <div class="card">
-                    <strong>{% trans "Diverse Genres" %}</strong><br>
-                    {% with genres=wrap_data.top_artists|dictsort:"genres"|slice:":3" %}
-                        {% for artist in genres %}
-                            {{ artist.genres|first }}{% if not forloop.last %}, {% endif %}
-                        {% endfor %}
-                    {% endwith %}
-                </div>
-            </div>
-        </div>
+ <div class="slide recently-played-tracks-slide">
+    <h2>{% trans "Recently Played Tracks" %}</h2>
+</div>
 
-        <!-- Slide 5: Recently Played Tracks -->
+
+
+
+<!-- Slide 5: Recently Played Tracks -->
         <div class="slide">
-            <h2>{% trans "Recently Played Tracks" %}</h2>
             <div class="card-grid">
                 {% for item in wrap_data.recently_played %}
                     <div class="card">
@@ -365,41 +652,10 @@
             </div>
         </div>
 
-        <!-- Slide 6: Recent Tracks Trivia -->
-        <div class="slide">
-            <h2>{% trans "Recent Tracks Insights" %}</h2>
-            <div class="card-grid">
-                <div class="card">
-                    <strong>{% trans "Total Recent Tracks" %}</strong><br>
-                    {{ wrap_data.recently_played|length }}
-                </div>
-            </div>
-        </div>
 
-        <!-- Slide 7: Mix Insights -->
-        <div class="slide">
-            <h2>{% trans "Your Musical Mix" %}</h2>
-            <div class="card-grid">
-                <div class="card">
-                    <strong>{% trans "Unique Artists" %}</strong><br>
-                    {{ wrap_data.top_artists|length }}
-                </div>
-                <div class="card">
-                    <strong>{% trans "Unique Tracks" %}</strong><br>
-                    {{ wrap_data.top_tracks|length }}
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 8: Thank You -->
-        <div class="slide">
-            <h2>{% trans "Your Musical Journey" %}</h2>
-            <div class="card-grid">
-                <div class="card">
-                    <strong>{% trans "Thanks for Listening!" %}</strong>
-                </div>
-            </div>
-        </div>
+        <div class="slide thank-you-slide active">
+    <h2 class="thank-you-heading">{% trans "Thanks for Stopping By" %}!</h2>
+</div>
 
         <!-- Slide Indicators -->
         <div class="slide-indicators"></div>
@@ -420,74 +676,84 @@
 
 {% block extra_js %}
 <script>
-    {% if wrap_data %}
-    document.addEventListener("DOMContentLoaded", function () {
-        const slides = document.querySelectorAll('.slide');
-        const indicatorsContainer = document.querySelector('.slide-indicators');
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        let currentSlide = 0;
+{% if wrap_data %}
+document.addEventListener("DOMContentLoaded", function () {
+    const slides = document.querySelectorAll('.slide');
+    const indicatorsContainer = document.querySelector('.slide-indicators');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    let currentSlide = 0;
 
-        // Create indicators
-        slides.forEach((_, index) => {
-            const indicator = document.createElement('div');
-            indicator.classList.add('indicator');
-            if (index === 0) indicator.classList.add('active');
-            indicator.addEventListener('click', () => goToSlide(index));
-            indicatorsContainer.appendChild(indicator);
+    // Create indicators
+    slides.forEach((_, index) => {
+        const indicator = document.createElement('div');
+        indicator.classList.add('indicator');
+        if (index === 0) indicator.classList.add('active');
+        indicator.addEventListener('click', () => goToSlide(index));
+        indicatorsContainer.appendChild(indicator);
+    });
+
+    const indicators = document.querySelectorAll('.indicator');
+
+    function showSlide(index) {
+        slides.forEach((slide, slideIndex) => {
+            if (slideIndex === index) {
+                slide.classList.add('active');
+                slide.classList.remove('inactive');
+            } else if (slideIndex < index) {
+                slide.classList.add('inactive');
+                slide.classList.remove('active');
+            } else {
+                slide.classList.add('inactive');
+                slide.classList.remove('active');
+            }
         });
 
-        const indicators = document.querySelectorAll('.indicator');
-
-        function showSlide(index) {
-            slides.forEach((slide, slideIndex) => {
-                if (slideIndex === index) {
-                    slide.classList.add('active');
-                    slide.classList.remove('inactive');
-                } else if (slideIndex < index) {
-                    slide.classList.add('inactive');
-                    slide.classList.remove('active');
-                } else {
-                    slide.classList.add('inactive');
-                    slide.classList.remove('active');
-                }
-            });
-
-            indicators.forEach((indicator, indicatorIndex) => {
-                indicator.classList.toggle('active', indicatorIndex === index);
-            });
-
-            currentSlide = index;
-        }
-
-        function goToSlide(index) {
-            currentSlide = index;
-            showSlide(currentSlide);
-        }
-
-        document.getElementById('next-slide').addEventListener('click', function () {
-            currentSlide = (currentSlide + 1) % slides.length;
-            showSlide(currentSlide);
+        indicators.forEach((indicator, indicatorIndex) => {
+            indicator.classList.toggle('active', indicatorIndex === index);
         });
 
-        document.getElementById('prev-slide').addEventListener('click', function () {
-            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-            showSlide(currentSlide);
-        });
+        currentSlide = index;
+    }
 
-        // Dark mode toggle
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.body.classList.add('dark-mode');
-        }
+    function goToSlide(index) {
+        currentSlide = index;
+        showSlide(currentSlide);
+    }
 
-        darkModeToggle.addEventListener('click', function () {
-            document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-        });
-
-        // Initial load
+    document.getElementById('next-slide').addEventListener('click', function () {
+        currentSlide = (currentSlide + 1) % slides.length;
         showSlide(currentSlide);
     });
-    {% endif %}
+
+    document.getElementById('prev-slide').addEventListener('click', function () {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        showSlide(currentSlide);
+    });
+
+    // Dark mode toggle
+    function updateDarkModeButton() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        darkModeToggle.textContent = isDarkMode
+            ? "{% trans 'Toggle Light Mode' %}"
+            : "{% trans 'Toggle Dark Mode' %}";
+    }
+
+    // Check initial dark mode state from localStorage
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        updateDarkModeButton();
+    }
+
+    darkModeToggle.addEventListener('click', function () {
+        document.body.classList.toggle('dark-mode');
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        updateDarkModeButton();
+    });
+
+    // Initial load
+    showSlide(currentSlide);
+});
+{% endif %}
 </script>
 {% endblock %}

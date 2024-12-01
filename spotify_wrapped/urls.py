@@ -31,3 +31,4 @@ urlpatterns += i18n_patterns(
     # Admin URL
     path('admin/', admin.site.urls),
 )
+
