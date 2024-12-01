@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-01 03:41-0500\n"
+"POT-Creation-Date: 2024-12-01 18:19-0500\n"
 "PO-Revision-Date: 2024-11-29 02:00+0000\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: French <LL@li.org>\n"
@@ -22,19 +22,23 @@ msgstr "Mon Spotify Wrap"
 msgid "Home"
 msgstr "Accueil"
 
-#: templates/base.html:118
+#: templates/base.html:117
+msgid "Generate"
+msgstr "Générer"
+
+#: templates/base.html:119
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: templates/base.html:120
+#: templates/base.html:121
 msgid "Login"
 msgstr "Connexion"
 
-#: templates/base.html:121
+#: templates/base.html:122
 msgid "Sign Up"
 msgstr "Inscription"
 
-#: templates/base.html:133
+#: templates/base.html:134
 msgid "My Spotify Wrap. All rights reserved."
 msgstr "Mon Spotify Wrap. Tous droits réservés."
 
@@ -66,7 +70,7 @@ msgstr "Vous n'avez pas encore généré de wraps."
 msgid "Your Spotify Wrapped"
 msgstr "Votre Spotify Wrapped"
 
-#: templates/wrap.html:560 templates/wrap.html:738
+#: templates/wrap.html:560 templates/wrap.html:735
 msgid "Toggle Dark Mode"
 msgstr "Basculer en mode sombre"
 
@@ -76,57 +80,50 @@ msgstr "Changer de langue"
 
 #: templates/wrap.html:582
 msgid "Welcome, Your Musical Journey Begins"
-msgstr ""
+msgstr "Bienvenue, votre voyage musical commence"
 
-#: templates/wrap.html:590
+#: templates/wrap.html:589
 #, fuzzy
 #| msgid "Your Top Genres"
 msgid "Your Top Songs"
-msgstr "Vos genres préférés"
+msgstr "Vos chansons préférées"
 
-#: templates/wrap.html:606 templates/wrap.html:649
+#: templates/wrap.html:601 templates/wrap.html:646
 msgid "by"
-msgstr ""
+msgstr "par"
 
-#: templates/wrap.html:613
+#: templates/wrap.html:608
 msgid "Your Top Artists"
 msgstr "Vos meilleurs artistes"
 
-#: templates/wrap.html:637
+#: templates/wrap.html:634
 msgid "Recently Played Tracks"
 msgstr "Titres écoutés récemment"
 
-#: templates/wrap.html:657
+#: templates/wrap.html:654
 msgid "Thanks for Stopping By"
-msgstr ""
+msgstr "Merci d'être passé"
 
-#: templates/wrap.html:665
+#: templates/wrap.html:662
 msgid "Previous"
 msgstr "Précédent"
 
-#: templates/wrap.html:666
+#: templates/wrap.html:663
 msgid "Next"
 msgstr "Suivant"
 
-#: templates/wrap.html:671
+#: templates/wrap.html:668
 msgid ""
 "Your Spotify session has expired or needs to be refreshed. Please reconnect "
 "your Spotify account."
-msgstr ""
+msgstr "Votre session Spotify a expiré ou doit être actualisée. Veuillez reconnecter votre compte Spotify."
 
-#: templates/wrap.html:672
+#: templates/wrap.html:669
 msgid "Connect to Spotify"
-msgstr ""
+msgstr "Se connecter à Spotify"
 
-#: templates/wrap.html:737
+#: templates/wrap.html:734
 #, fuzzy
 #| msgid "Toggle Dark Mode"
 msgid "Toggle Light Mode"
-msgstr "Basculer en mode sombre"
-
-#~ msgid "Your Top Tracks"
-#~ msgstr "Vos meilleurs titres"
-
-# Obsolete messages
-#~ msgid "%(track_name)s by %(artist_name)s"
-#~ msgstr "%(track_name)s par %(artist_name)s"
+msgstr "Basculer en mode clair"
