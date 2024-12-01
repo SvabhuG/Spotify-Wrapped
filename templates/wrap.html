@@ -594,7 +594,7 @@
     <div class="card-grid">
         {% for track in wrap_data.top_tracks %}
             <div class="card">
-                <img src="{% if track.album_cover %}{{ track.album_cover}}{% else %}/path/to/placeholder-image.jpg{% endif %}"
+                <img src="{% if track.album_cover %}{{ track.album_cover }}{% else %}/path/to/placeholder-image.jpg{% endif %}"
                      alt="{{ track.name }} Album Cover"
                      style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 1em; object-fit: cover;">
                 <strong>{{ track.name }}</strong><br>

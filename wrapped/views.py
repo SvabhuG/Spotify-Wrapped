@@ -8,6 +8,7 @@ from django.conf import settings
 from collections import Counter
 import time
 import requests
+import logging
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -173,8 +174,18 @@ def generate_wrap(request):
         logging.debug(f"Processed top artists data: {top_artists}")
 
         # Fetch top tracks
-        top_tracks = get_user_top_tracks(access_token)
-        logging.debug(f"Fetched top tracks: {top_tracks}")
+        top_tracks_raw = get_user_top_tracks(access_token)
+        logging.debug(f"Raw top tracks data: {top_tracks_raw}")
+        top_tracks = [
+            {
+                'name': track['name'],
+                'artist': ', '.join(artist['name'] for artist in track['artists']),
+                'album_name': track['album']['name'],
+                'album_cover': track['album']['images'][0]['url'] if track['album']['images'] else None,
+            }
+            for track in top_tracks_raw
+        ]
+        logging.debug(f"Processed top tracks data: {top_tracks}")
 
         # Process recently played tracks
         recently_played_raw = get_recently_played(access_token)
