@@ -582,7 +582,6 @@
     <h2 class="welcome-heading">{% trans "Welcome, Your Musical Journey Begins" %}!</h2>
 </div>
 
-        <!-- Rest of the existing slides... -->
 
 
     <!-- Slide 1: Top Artists -->
@@ -591,23 +590,19 @@
 </div>
 
         <!-- Slide 1: Your Top Tracks -->
-        <div class="slide active">
-        <div class="card-grid">
-            {% for track in wrap_data.top_tracks %}
-                <div class="card">
-                    {% if track.album_cover %}
-                        <img src="{{ track.album_cover }}" alt="{{ track.name }} Album Cover"
-                             style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 1em; object-fit: cover;">
-                    {% else %}
-                        <img src="/path/to/placeholder-image.jpg" alt="Placeholder Album Cover"
-                             style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 1em; object-fit: cover;">
-                    {% endif %}
-                    <strong>{{ track.name }}</strong><br>
-                    {% trans "by" %} {{ track.artist }}
-                </div>
-            {% endfor %}
-        </div>
+<div class="slide active">
+    <div class="card-grid">
+        {% for track in wrap_data.top_tracks %}
+            <div class="card">
+                <img src="{% if track.album_cover %}{{ track.album_cover}}{% else %}/path/to/placeholder-image.jpg{% endif %}"
+                     alt="{{ track.name }} Album Cover"
+                     style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 1em; object-fit: cover;">
+                <strong>{{ track.name }}</strong><br>
+                {% trans "by" %} {{ track.artist }}
+            </div>
+        {% endfor %}
     </div>
+</div>
 
     <div class="slide top-artists-slide">
     <h2 class="top-artists-title">{% trans "Your Top Artists" %}</h2>
@@ -621,12 +616,14 @@
         {% for artist in wrap_data.top_artists %}
             <div class="card">
                 {% if artist.profile_pic %}
-                    <img src="{{ artist.profile_pic }}" alt="{{ artist.name }} Profile Picture"
-                         style="width: 100%; height: auto; border-radius: 50%; margin-bottom: 1em; object-fit: cover;">
-                {% else %}
-                    <img src="/path/to/placeholder-image.jpg" alt="Placeholder Profile Picture"
-                         style="width: 100%; height: auto; border-radius: 50%; margin-bottom: 1em; object-fit: cover;">
-                {% endif %}
+                <img src="{{ artist.profile_pic }}" alt="{{ artist.name }} Profile Picture"
+                     style="width: 100%; height: auto; border-radius: 50%; margin-bottom: 1em; object-fit: cover;">
+            {% else %}
+                <img src="/path/to/placeholder-image.jpg" alt="Placeholder Profile Picture"
+                     style="width: 100%; height: auto; border-radius: 50%; margin-bottom: 1em; object-fit: cover;">
+            {% endif %}
+
+
                 <strong>{{ artist.name }}</strong>
             </div>
         {% endfor %}

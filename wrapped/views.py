@@ -128,20 +128,28 @@ def followed_artists(request):
 from .spotify_api import get_user_top_artists, get_user_top_tracks, get_recently_played
 
 
+
+
 @login_required
 def generate_wrap(request):
+    logging.debug("Starting generate_wrap method")
+
     # Get access token
     profile = SpotifyProfile.objects.filter(user=request.user).first()
     if not profile:
+        logging.warning("No Spotify profile found for the user")
         return redirect('spotify_connect')
 
     # Refresh token if needed
     if is_token_expired(profile):
+        logging.info("Access token expired. Attempting to refresh.")
         refreshed = refresh_spotify_token(profile)
         if not refreshed:
+            logging.error("Failed to refresh token. Redirecting to Spotify connect.")
             return redirect('spotify_connect')
 
     access_token = profile.access_token
+    logging.debug("Access token acquired successfully")
 
     # Create Spotify client
     sp = Spotify(auth=access_token)
@@ -150,13 +158,27 @@ def generate_wrap(request):
         # Fetch user profile
         user_profile = sp.current_user()
         spotify_username = user_profile.get('display_name', 'Spotify User')
+        logging.debug(f"Fetched Spotify user profile: {spotify_username}")
 
-        # Fetch user data from Spotify
-        top_artists = get_user_top_artists(access_token)
+        # Fetch top artists
+        top_artists_raw = get_user_top_artists(access_token)
+        logging.debug(f"Raw top artists data: {top_artists_raw}")
+        top_artists = [
+            {
+                'name': artist['name'],
+                'profile_pic': artist['images'][0]['url'] if artist.get('images') else None
+            }
+            for artist in top_artists_raw
+        ]
+        logging.debug(f"Processed top artists data: {top_artists}")
+
+        # Fetch top tracks
         top_tracks = get_user_top_tracks(access_token)
+        logging.debug(f"Fetched top tracks: {top_tracks}")
 
         # Process recently played tracks
         recently_played_raw = get_recently_played(access_token)
+        logging.debug(f"Raw recently played data: {recently_played_raw}")
 
         # Handle recently_played_raw depending on its type
         if isinstance(recently_played_raw, dict):
@@ -165,6 +187,8 @@ def generate_wrap(request):
             recently_played_items = recently_played_raw
         else:
             recently_played_items = []
+
+        logging.debug(f"Processed recently played items: {recently_played_items}")
 
         # Extract track details
         recently_played = [
@@ -178,8 +202,11 @@ def generate_wrap(request):
             }
             for item in recently_played_items
         ]
+        logging.debug(f"Processed recently played tracks: {recently_played}")
 
+        # Fetch followed artists
         followed_artists = get_user_followed_artists(access_token)
+        logging.debug(f"Fetched followed artists: {followed_artists}")
 
         # Prepare wrap data
         wrap_data = {
@@ -189,22 +216,24 @@ def generate_wrap(request):
             'recently_played': recently_played,
             'followed_artists': followed_artists,
         }
+        logging.info(f"Wrap data prepared successfully: {wrap_data}")
 
         # Save wrap to the database
         SpotifyWrap.objects.create(
             user=request.user,
             data=wrap_data  # Ensure data is JSON-serializable
         )
+        logging.info("Wrap data saved to the database successfully")
 
         # Pass data to the template
         return render(request, 'wrap.html', {'wrap_data': wrap_data})
 
     except SpotifyException as e:
-        print(f"Spotify API Error: {e}")
+        logging.error(f"Spotify API Error: {e}")
         return redirect('spotify_connect')
 
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        logging.error(f"Unexpected error: {e}")
         return redirect('spotify_connect')
 
 
