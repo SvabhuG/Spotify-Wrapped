@@ -83,7 +83,6 @@ msgid "Welcome, Your Musical Journey Begins"
 msgstr "Bienvenue, votre voyage musical commence"
 
 #: templates/wrap.html:589
-#, fuzzy
 #| msgid "Your Top Genres"
 msgid "Your Top Songs"
 msgstr "Vos chansons préférées"
@@ -123,7 +122,6 @@ msgid "Connect to Spotify"
 msgstr "Se connecter à Spotify"
 
 #: templates/wrap.html:734
-#, fuzzy
 #| msgid "Toggle Dark Mode"
 msgid "Toggle Light Mode"
 msgstr "Basculer en mode clair"
