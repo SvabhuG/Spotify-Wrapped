@@ -496,77 +496,101 @@ body:not(.dark-mode) .nav-button:hover {
         background: #1ed760;
     }
 
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-        .slide h2 {
-            font-size: 2em;
-        }
 
-        .card {
-            flex: 1 1 calc(50% - 2em);
-        }
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .slide h2 {
+        font-size: 2em;
+        text-align: center; /* Center slide title */
     }
 
-    @media (max-width: 600px) {
-        .top-nav {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .dark-mode-button {
-            margin-left: 0;
-            margin-top: 1em;
-        }
-
-        .language-switcher {
-            margin-left: 0;
-            margin-top: 1em;
-        }
-
-        .slide h2 {
-            font-size: 1.5em;
-        }
-
-        .card {
-            flex: 1 1 100%;
-        }
-
-        .nav-button {
-            padding: 0.8em 1.5em;
-            font-size: 0.9em;
-        }
-
-        .navigation {
-            flex-direction: column;
-            gap: 0.5em;
-        }
-
-        /* Adjust slide indicators */
-        .slide-indicators {
-            bottom: 0.5em;
-        }
-
-        .indicator {
-            width: 10px;
-            height: 10px;
-        }
+    .card {
+        flex: 1 1 calc(50% - 2em);
     }
 
-    /* Message Container for Reauthentication */
-    .message-container {
-        max-width: 800px;
-        margin: 2em auto;
-        text-align: center;
-        background: #191414;
-        padding: 2em;
-        border-radius: 15px;
-        color: #ffffff;
+    /* Center content in the top navigation */
+    .top-nav {
+        flex-direction: column;
+        align-items: center; /* Center navigation items */
+        justify-content: center;
     }
 
-    .message-container p {
-        font-size: 1.2em;
-        margin-bottom: 1.5em;
+    /* Center buttons (dark mode, language switcher) */
+    .dark-mode-button,
+    .language-switcher {
+        margin-top: 1em; /* Add margin between buttons */
+        display: block;
+        width: 100%;
+        text-align: center; /* Center buttons horizontally */
     }
+
+    /* Adjust space between the navigation buttons */
+    .navigation {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5em; /* Increased gap between buttons */
+        justify-content: center;
+        align-items: center;
+    }
+
+    .nav-button {
+        width: 100%; /* Make buttons take full width */
+        padding: 1em 2em; /* Keep the padding as per the original design */
+    }
+
+    .dark-mode-button {
+        margin-left: 0; /* Remove any left margin for dark mode button */
+    }
+
+    .language-switcher {
+        margin-left: 0; /* Remove any left margin for language switcher */
+    }
+}
+
+@media (max-width: 600px) {
+    /* Center slide titles */
+    .slide h2 {
+        font-size: 1.5em;
+        text-align: center; /* Ensure text is centered on smaller screens */
+    }
+
+    .card {
+        flex: 1 1 100%; /* Stack cards vertically on smaller screens */
+    }
+
+    /* Adjust nav button padding and size */
+    .nav-button {
+        padding: 1em 2em;
+        font-size: 1em; /* Adjust button size */
+        margin-top: 1.5em; /* Adjust spacing between nav buttons */
+    }
+
+    /* Adjust the language switcher and dark mode buttons */
+    .dark-mode-button,
+    .language-switcher {
+        margin-top: 1.5em; /* Add top margin */
+        width: 100%; /* Make buttons full width */
+        text-align: center; /* Ensure they are centered */
+    }
+
+    .navigation {
+        flex-direction: column;
+        gap: 1.5em; /* Increase gap between buttons */
+        justify-content: center;
+        align-items: center; /* Align items horizontally */
+    }
+
+    /* Adjust slide indicators */
+    .slide-indicators {
+        bottom: 0.5em;
+    }
+
+    .indicator {
+        width: 10px;
+        height: 10px;
+    }
+}
+
 </style>
 {% endblock %}
 
