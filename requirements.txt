@@ -37,7 +37,6 @@ requests==2.32.3
 requests-aws4auth==1.3.1
 s3transfer==0.10.2
 scp==0.15.0
-setuptools @ file:///private/var/folders/m_/cksx93ys47x4621g0zbw_m4m0000gn/T/tmpsc7lpqit/setuptools-70.3.0-py3-none-any.whl#sha256=fe384da74336c398e0d956d1cae0669bc02eed936cdb1d49b57de1990dc11ffc
 six==1.16.0
 soupsieve==2.1
 spotipy==2.24.0
