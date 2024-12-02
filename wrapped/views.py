@@ -21,6 +21,9 @@ from .spotify_api import (
 )
 
 def get_spotify_oauth():
+    """
+    Create and return a SpotifyOAuth object for handling Spotify authentication.
+    """
     return SpotifyOAuth(
         client_id=settings.SPOTIPY_CLIENT_ID,
         client_secret=settings.SPOTIPY_CLIENT_SECRET,
@@ -30,6 +33,15 @@ def get_spotify_oauth():
     )
 
 def is_token_expired(profile):
+    """
+    Check if the Spotify access token for the given profile is expired.
+
+    Args:
+        profile (SpotifyProfile): The user's Spotify profile.
+
+    Returns:
+        bool: True if the token is expired or will expire in less than 60 seconds, False otherwise.
+    """
     if not profile.expires_at:
         # `expires_at` is missing; consider the token expired
         return True
@@ -37,6 +49,15 @@ def is_token_expired(profile):
     return profile.expires_at - now < 60  # Consider expired if less than 1 minute remains
 
 def refresh_spotify_token(profile):
+    """
+    Refresh the Spotify access token for the given profile.
+
+    Args:
+        profile (SpotifyProfile): The user's Spotify profile.
+
+    Returns:
+        bool: True if the token was successfully refreshed, False otherwise.
+    """
     sp_oauth = get_spotify_oauth()
     try:
         token_info = sp_oauth.refresh_access_token(profile.refresh_token)
@@ -50,15 +71,32 @@ def refresh_spotify_token(profile):
         print(f"Error refreshing token: {e}")
         return False
 
-
 @login_required
 def spotify_connect(request):
+    """
+    Redirect the user to the Spotify authorization page to initiate the connection process.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: A redirect response to the Spotify authorization page.
+    """
     sp_oauth = get_spotify_oauth()
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
 @login_required
 def spotify_callback(request):
+    """
+    Handle the callback from Spotify after user authentication, and store the user's tokens.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: A redirect response to either the 'generate_wrap' view or an error page.
+    """
     code = request.GET.get('code')
     sp_oauth = get_spotify_oauth()
     token_info = sp_oauth.get_access_token(code)
@@ -105,6 +143,15 @@ def spotify_callback(request):
     return render(request, 'error.html', {'message': 'Failed to obtain token information from Spotify.'})
 
 def followed_artists(request):
+    """
+    Retrieve the list of artists followed by the authenticated user.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        JsonResponse: A JSON response containing the followed artists or an error message.
+    """
     access_token = request.session.get("access_token")  # Retrieve stored token
 
     if not access_token:
@@ -126,13 +173,17 @@ def followed_artists(request):
             status=response.status_code,
         )
 
-from .spotify_api import get_user_top_artists, get_user_top_tracks, get_recently_played
-
-
-
-
 @login_required
 def generate_wrap(request):
+    """
+    Generate a Spotify Wrapped summary for the authenticated user and store it in the database.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: A response rendering the 'wrap.html' template with the user's wrap data.
+    """
     logging.debug("Starting generate_wrap method")
 
     # Get access token
@@ -217,64 +268,98 @@ def generate_wrap(request):
 
         # Fetch followed artists
         followed_artists = get_user_followed_artists(access_token)
-        logging.debug(f"Fetched followed artists: {followed_artists}")
+        logging.debug(f"Fetched followed artists data: {followed_artists}")
 
-        # Prepare wrap data
-        wrap_data = {
-            'spotify_username': spotify_username,
-            'top_artists': top_artists,
-            'top_tracks': top_tracks,
-            'recently_played': recently_played,
-            'followed_artists': followed_artists,
-        }
-        logging.info(f"Wrap data prepared successfully: {wrap_data}")
+        # Create a summary of artist counts
+        artist_names = [artist['name'] for artist in followed_artists]
+        artist_counts = Counter(artist_names)
+        artist_summary = artist_counts.most_common(5)  # Get the top 5 followed artists
 
-        # Save wrap to the database
-        SpotifyWrap.objects.create(
+        logging.debug(f"Top followed artists summary: {artist_summary}")
+
+        # Save wrap data to the database
+        wrap = SpotifyWrap(
             user=request.user,
-            data=wrap_data  # Ensure data is JSON-serializable
+            top_artists=top_artists,
+            top_tracks=top_tracks,
+            recently_played=recently_played,
+            followed_artists=artist_summary,
         )
-        logging.info("Wrap data saved to the database successfully")
+        wrap.save()
 
-        # Pass data to the template
-        return render(request, 'wrap.html', {'wrap_data': wrap_data})
+        logging.info("SpotifyWrap data saved successfully")
 
+        return render(
+            request,
+            "wrap.html",
+            {
+                "spotify_username": spotify_username,
+                "top_artists": top_artists,
+                "top_tracks": top_tracks,
+                "recently_played": recently_played,
+                "followed_artists": artist_summary,
+            },
+        )
     except SpotifyException as e:
-        logging.error(f"Spotify API Error: {e}")
-        return redirect('spotify_connect')
-
+        logging.error(f"SpotifyException occurred: {e}")
+        return render(request, 'error.html', {'message': 'An error occurred while fetching data from Spotify.'})
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
-        return redirect('spotify_connect')
-
+        return render(request, 'error.html', {'message': 'An unexpected error occurred.'})
 
 @login_required
 def wrap_history(request):
+    """
+    Display the history of Spotify Wrapped summaries for the authenticated user.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: A response rendering the 'history.html' template with the user's wrap history.
+    """
     profile = SpotifyProfile.objects.filter(user=request.user).first()
     if not profile:
+        # Redirect to Spotify connection if no profile exists for the user
         return redirect('spotify_connect')
 
-    # Check if access token is expired or expires_at is missing
+    # Check if the access token is expired or if the expiration time is missing
     if is_token_expired(profile):
         refreshed = refresh_spotify_token(profile)
         if not refreshed:
+            # Redirect to Spotify connection if the token refresh fails
             return redirect('spotify_connect')
 
+    # Fetch the user's Spotify Wrap history and order by creation date
     wraps = SpotifyWrap.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'history.html', {'wraps': wraps})
 
 @login_required
 def replay_wrap(request, wrap_id):
+    """
+    Display a specific Spotify Wrapped summary for the authenticated user.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        wrap_id (int): The ID of the wrap to display.
+
+    Returns:
+        HttpResponse: A response rendering the 'wrap.html' template with the wrap data.
+    """
     profile = SpotifyProfile.objects.filter(user=request.user).first()
     if not profile:
+        # Redirect to Spotify connection if no profile exists for the user
         return redirect('spotify_connect')
 
-    # Check if access token is expired or expires_at is missing
+    # Check if the access token is expired or if the expiration time is missing
     if is_token_expired(profile):
         refreshed = refresh_spotify_token(profile)
         if not refreshed:
+            # Redirect to Spotify connection if the token refresh fails
             return redirect('spotify_connect')
 
+    # Retrieve the specific wrap object, or return a 404 if not found
     wrap = get_object_or_404(SpotifyWrap, id=wrap_id, user=request.user)
-    wrap_data = wrap.data
+    wrap_data = wrap.data  # Extract the wrap data from the object
+
     return render(request, 'wrap.html', {'wrap_data': wrap_data})

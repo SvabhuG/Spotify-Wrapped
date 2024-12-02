@@ -2,8 +2,17 @@ import requests
 
 BASE_URL = "https://api.spotify.com/v1/me"
 
-# Function to get top artists
 def get_user_top_artists(access_token):
+    """
+    Fetch the user's top artists from Spotify.
+
+    Args:
+        access_token (str): The OAuth access token for the Spotify API.
+
+    Returns:
+        list: A list of dictionaries containing information about the user's top artists.
+              Returns an empty list if the request fails.
+    """
     url = f"{BASE_URL}/top/artists?limit=10"  # Adjust the limit to 10 artists
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -14,8 +23,17 @@ def get_user_top_artists(access_token):
     else:
         return []
 
-# Function to get top tracks
 def get_user_top_tracks(access_token):
+    """
+    Fetch the user's top tracks from Spotify.
+
+    Args:
+        access_token (str): The OAuth access token for the Spotify API.
+
+    Returns:
+        list: A list of dictionaries containing information about the user's top tracks.
+              Returns an empty list if the request fails.
+    """
     url = f"{BASE_URL}/top/tracks?limit=10"  # Adjust the limit to 10 tracks
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -26,8 +44,17 @@ def get_user_top_tracks(access_token):
     else:
         return []
 
-# Function to get recently played tracks
 def get_recently_played(access_token):
+    """
+    Fetch the user's recently played tracks from Spotify.
+
+    Args:
+        access_token (str): The OAuth access token for the Spotify API.
+
+    Returns:
+        list: A list of dictionaries containing information about the user's recently played tracks.
+              Returns an empty list if the request fails.
+    """
     url = f"{BASE_URL}/player/recently-played?limit=10"  # Adjust the limit to 10 tracks
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -38,10 +65,19 @@ def get_recently_played(access_token):
     else:
         return []
 
-# Function to get followed artists (NEW FUNCTION)
 def get_user_followed_artists(access_token):
+    """
+    Fetch the artists followed by the user on Spotify.
+
+    Args:
+        access_token (str): The OAuth access token for the Spotify API.
+
+    Returns:
+        list: A list of dictionaries containing information about the user's followed artists.
+              Returns an empty list if the request fails.
+    """
     url = f"{BASE_URL}/following?type=artist&limit=10"  # Adjust the limit to 10 followed artists
-    headers = {
+    headers =
         "Authorization": f"Bearer {access_token}",
     }
     response = requests.get(url, headers=headers)
