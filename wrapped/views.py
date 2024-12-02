@@ -16,6 +16,16 @@ from .spotify_api import (
 
 
 def is_token_expired(profile):
+    """
+        Check if the access token for a given profile is expired or about to expire.
+
+        Args:
+            profile (SpotifyProfile): The profile object containing the access token and its expiration time.
+
+        Returns:
+            bool: True if the token is expired or will expire in less than 60 seconds; False otherwise.
+        """
+
     if not profile.expires_at:
         # `expires_at` is missing; consider the token expired
         return True
@@ -24,6 +34,16 @@ def is_token_expired(profile):
 
 
 def refresh_spotify_token(profile):
+    """
+        Refresh the access token for a given Spotify profile using the refresh token.
+
+        Args:
+            profile (SpotifyProfile): The profile object containing the current refresh token and other details.
+
+        Returns:
+            bool: True if the token was successfully refreshed; False otherwise.
+        """
+
     token_url = "https://accounts.spotify.com/api/token"
     client_id = settings.SPOTIPY_CLIENT_ID
     client_secret = settings.SPOTIPY_CLIENT_SECRET
@@ -56,6 +76,16 @@ def refresh_spotify_token(profile):
 
 @login_required
 def spotify_connect(request):
+    """
+        Redirect the user to Spotify's authorization page for user authentication and consent.
+
+        Args:
+            request (HttpRequest): The HTTP request object containing user and request data.
+
+        Returns:
+            HttpResponse: A redirect response to Spotify's authorization page.
+        """
+
     client_id = settings.SPOTIPY_CLIENT_ID
     redirect_uri = settings.SPOTIPY_REDIRECT_URI
     scope = "user-top-read user-read-recently-played user-follow-read"
@@ -71,6 +101,16 @@ def spotify_connect(request):
 
 @login_required
 def spotify_callback(request):
+    """
+        Handle the callback from Spotify after user authentication and obtain the access and refresh tokens.
+
+        Args:
+            request (HttpRequest): The HTTP request object containing the callback data from Spotify.
+
+        Returns:
+            HttpResponse: Redirect response to the 'generate_wrap' page if successful, or an error page if not.
+        """
+
     code = request.GET.get('code')
     if not code:
         return render(request, 'error.html', {'message': 'No code provided in the callback.'})
@@ -157,6 +197,16 @@ def spotify_callback(request):
 
 @login_required
 def generate_wrap(request):
+    """
+        Generate and display a personalized Spotify wrap for the authenticated user.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            HttpResponse: Renders the 'wrap.html' template with wrap data or redirects to the Spotify connection page if an error occurs.
+        """
+
     logging.debug("Starting generate_wrap method")
 
     # Get access token
@@ -276,6 +326,16 @@ def generate_wrap(request):
 
 @login_required
 def wrap_history(request):
+    """
+        Display the history of Spotify wraps for the authenticated user.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            HttpResponse: Renders the 'history.html' template with wrap history or redirects to the Spotify connection page if the user is not authenticated or has issues with the access token.
+        """
+
     profile = SpotifyProfile.objects.filter(user=request.user).first()
     if not profile:
         return redirect('spotify_connect')
@@ -292,6 +352,17 @@ def wrap_history(request):
 
 @login_required
 def replay_wrap(request, wrap_id):
+    """
+        Display a specific wrap from the user's wrap history.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            wrap_id (int): The ID of the specific wrap to be displayed.
+
+        Returns:
+            HttpResponse: Renders the 'wrap.html' template with the specified wrap data or redirects to the Spotify connection page if the user is not authenticated or has issues with the access token.
+        """
+
     profile = SpotifyProfile.objects.filter(user=request.user).first()
     if not profile:
         return redirect('spotify_connect')

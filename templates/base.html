@@ -136,6 +136,14 @@
 
     <!-- JavaScript for mobile menu -->
     <script>
+
+ /**
+ * Toggles the 'open' class on the navigation menu element with the ID 'nav-menu'.
+ * This function is used to show or hide the menu when called, typically when
+ * a button is clicked.
+ *
+ * @function toggleMenu
+ */
         function toggleMenu() {
             var nav = document.getElementById('nav-menu');
             nav.classList.toggle('open');
@@ -145,4 +153,3 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
-
