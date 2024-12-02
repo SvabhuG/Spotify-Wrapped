@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security settings
 SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
 DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'spotify-wrapped-svabhug-28f62d4032b4.herokuapp.com']
+ALLOWED_HOSTS = ['*']
 
 # Spotify API Credentials
 SPOTIPY_CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
