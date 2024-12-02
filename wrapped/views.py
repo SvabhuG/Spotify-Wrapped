@@ -1,33 +1,19 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import SpotifyProfile, SpotifyWrap
-from spotipy import Spotify
-from spotipy.oauth2 import SpotifyOAuth
-from spotipy.exceptions import SpotifyException
 from django.conf import settings
-from collections import Counter
+from django.http import JsonResponse
 import time
 import requests
 import logging
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from .models import SpotifyWrap, SpotifyProfile
+from urllib.parse import urlencode
+from .models import SpotifyProfile, SpotifyWrap
 from .spotify_api import (
+    get_user_followed_artists,
     get_user_top_artists,
     get_user_top_tracks,
     get_recently_played,
-    get_user_followed_artists,  # Import the new function
 )
 
-def get_spotify_oauth():
-    return SpotifyOAuth(
-        client_id=settings.SPOTIPY_CLIENT_ID,
-        client_secret=settings.SPOTIPY_CLIENT_SECRET,
-        redirect_uri=settings.SPOTIPY_REDIRECT_URI,
-        scope="user-top-read user-read-recently-played",
-        cache_path=None  # Disable cache file usage
-    )
 
 def is_token_expired(profile):
     if not profile.expires_at:
@@ -36,37 +22,101 @@ def is_token_expired(profile):
     now = int(time.time())
     return profile.expires_at - now < 60  # Consider expired if less than 1 minute remains
 
+
 def refresh_spotify_token(profile):
-    sp_oauth = get_spotify_oauth()
-    try:
-        token_info = sp_oauth.refresh_access_token(profile.refresh_token)
-        profile.access_token = token_info['access_token']
-        if 'refresh_token' in token_info:
-            profile.refresh_token = token_info['refresh_token']
-        profile.expires_at = token_info['expires_at']
-        profile.save()
-        return True
-    except Exception as e:
-        print(f"Error refreshing token: {e}")
+    token_url = "https://accounts.spotify.com/api/token"
+    client_id = settings.SPOTIPY_CLIENT_ID
+    client_secret = settings.SPOTIPY_CLIENT_SECRET
+
+    data = {
+        'grant_type': 'refresh_token',
+        'refresh_token': profile.refresh_token,
+    }
+
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    auth = (client_id, client_secret)
+
+    response = requests.post(token_url, data=data, headers=headers, auth=auth)
+    if response.status_code != 200:
+        print("Error refreshing token:", response.text)
         return False
+
+    token_info = response.json()
+    profile.access_token = token_info['access_token']
+    if 'refresh_token' in token_info:
+        profile.refresh_token = token_info['refresh_token']
+    expires_in = token_info.get('expires_in')
+    profile.expires_at = int(time.time()) + expires_in
+    profile.save()
+    return True
 
 
 @login_required
 def spotify_connect(request):
-    sp_oauth = get_spotify_oauth()
-    auth_url = sp_oauth.get_authorize_url()
+    client_id = settings.SPOTIPY_CLIENT_ID
+    redirect_uri = settings.SPOTIPY_REDIRECT_URI
+    scope = "user-top-read user-read-recently-played user-follow-read"
+    params = {
+        "client_id": client_id,
+        "response_type": "code",
+        "redirect_uri": redirect_uri,
+        "scope": scope,
+    }
+    auth_url = "https://accounts.spotify.com/authorize?" + urlencode(params)
     return redirect(auth_url)
+
 
 @login_required
 def spotify_callback(request):
     code = request.GET.get('code')
-    sp_oauth = get_spotify_oauth()
-    token_info = sp_oauth.get_access_token(code)
+    if not code:
+        return render(request, 'error.html', {'message': 'No code provided in the callback.'})
+
+    token_url = "https://accounts.spotify.com/api/token"
+    redirect_uri = settings.SPOTIPY_REDIRECT_URI
+    client_id = settings.SPOTIPY_CLIENT_ID
+    client_secret = settings.SPOTIPY_CLIENT_SECRET
+
+    data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': redirect_uri
+    }
+
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    auth = (client_id, client_secret)
+
+    response = requests.post(token_url, data=data, headers=headers, auth=auth)
+    if response.status_code != 200:
+        print("Failed to obtain token_info. Response:", response.text)
+        return render(request, 'error.html', {'message': 'Failed to obtain token information from Spotify.'})
+
+    token_info = response.json()
     print("Received token_info:", token_info)
 
     if token_info:
-        sp = Spotify(auth=token_info['access_token'])
-        spotify_user = sp.current_user()
+        access_token = token_info.get('access_token')
+        refresh_token = token_info.get('refresh_token')
+        expires_in = token_info.get('expires_in')
+        expires_at = int(time.time()) + expires_in
+
+        # Use the access token to get user profile
+        user_profile_url = "https://api.spotify.com/v1/me"
+        headers = {
+            'Authorization': f'Bearer {access_token}'
+        }
+        response = requests.get(user_profile_url, headers=headers)
+        if response.status_code != 200:
+            print("Failed to get user profile. Response:", response.text)
+            return render(request, 'error.html', {'message': 'Failed to get user profile from Spotify.'})
+
+        spotify_user = response.json()
         spotify_id = spotify_user['id']
         print("Authenticated Spotify user ID:", spotify_id)
 
@@ -82,9 +132,9 @@ def spotify_callback(request):
             else:
                 # Update the existing profile
                 print("Updating existing SpotifyProfile for the same user.")
-                profile.access_token = token_info['access_token']
-                profile.refresh_token = token_info['refresh_token']
-                profile.expires_at = token_info['expires_at']
+                profile.access_token = access_token
+                profile.refresh_token = refresh_token
+                profile.expires_at = expires_at
                 profile.save()
                 print("SpotifyProfile updated successfully.")
         except SpotifyProfile.DoesNotExist:
@@ -93,9 +143,9 @@ def spotify_callback(request):
             profile = SpotifyProfile.objects.create(
                 user=request.user,
                 spotify_id=spotify_id,
-                access_token=token_info['access_token'],
-                refresh_token=token_info['refresh_token'],
-                expires_at=token_info['expires_at']
+                access_token=access_token,
+                refresh_token=refresh_token,
+                expires_at=expires_at
             )
             print("SpotifyProfile created successfully.")
 
@@ -103,32 +153,6 @@ def spotify_callback(request):
 
     print("Failed to obtain token_info.")
     return render(request, 'error.html', {'message': 'Failed to obtain token information from Spotify.'})
-
-def followed_artists(request):
-    access_token = request.session.get("access_token")  # Retrieve stored token
-
-    if not access_token:
-        return JsonResponse({"error": "User is not authenticated."}, status=401)
-
-    url = "https://api.spotify.com/v1/me/following"
-    headers = {"Authorization": f"Bearer {access_token}"}
-    params = {"type": "artist", "limit": 20}
-
-    # Make API request
-    response = requests.get(url, headers=headers, params=params)
-
-    if response.status_code == 200:
-        followed_artists = response.json()
-        return JsonResponse(followed_artists)  # Return data as JSON response
-    else:
-        return JsonResponse(
-            {"error": "Failed to fetch followed artists", "details": response.json()},
-            status=response.status_code,
-        )
-
-from .spotify_api import get_user_top_artists, get_user_top_tracks, get_recently_played
-
-
 
 
 @login_required
@@ -152,12 +176,18 @@ def generate_wrap(request):
     access_token = profile.access_token
     logging.debug("Access token acquired successfully")
 
-    # Create Spotify client
-    sp = Spotify(auth=access_token)
-
     try:
         # Fetch user profile
-        user_profile = sp.current_user()
+        user_profile_url = "https://api.spotify.com/v1/me"
+        headers = {
+            'Authorization': f'Bearer {access_token}'
+        }
+        response = requests.get(user_profile_url, headers=headers)
+        if response.status_code != 200:
+            logging.error(f"Failed to get user profile. Response: {response.text}")
+            return redirect('spotify_connect')
+
+        user_profile = response.json()
         spotify_username = user_profile.get('display_name', 'Spotify User')
         logging.debug(f"Fetched Spotify user profile: {spotify_username}")
 
@@ -239,10 +269,6 @@ def generate_wrap(request):
         # Pass data to the template
         return render(request, 'wrap.html', {'wrap_data': wrap_data})
 
-    except SpotifyException as e:
-        logging.error(f"Spotify API Error: {e}")
-        return redirect('spotify_connect')
-
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
         return redirect('spotify_connect')
@@ -262,6 +288,7 @@ def wrap_history(request):
 
     wraps = SpotifyWrap.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'history.html', {'wraps': wraps})
+
 
 @login_required
 def replay_wrap(request, wrap_id):
