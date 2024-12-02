@@ -3,14 +3,17 @@ from django.contrib.auth.models import User
 
 class SpotifyProfile(models.Model):
     """
-    Represents a user's Spotify profile linked to their Django user account.
+    Represents a user's Spotify authentication profile.
+
+    This model stores Spotify-specific authentication and user information,
+    linking a Django user with their Spotify account credentials.
 
     Attributes:
-        user (User): A one-to-one relationship with the Django User model.
-        spotify_id (str): The unique identifier for the user on Spotify.
-        access_token (str): The OAuth access token for accessing Spotify APIs.
-        refresh_token (str): The OAuth refresh token for renewing the access token.
-        expires_at (int): The timestamp indicating when the access token expires.
+        user (OneToOneField): One-to-one relationship with Django's User model.
+        spotify_id (CharField): Unique Spotify user identifier.
+        access_token (TextField): Current OAuth access token for Spotify API.
+        refresh_token (TextField): Token used to obtain new access tokens.
+        expires_at (IntegerField): Timestamp when the current access token expires.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     spotify_id = models.CharField(max_length=50, unique=True)
@@ -20,23 +23,25 @@ class SpotifyProfile(models.Model):
 
     def __str__(self):
         """
-        Returns a string representation of the Spotify profile.
+        String representation of the SpotifyProfile.
 
         Returns:
-            str: The username of the associated user with the suffix 'Spotify Profile'.
+            str: Username's Spotify Profile
         """
         return f"{self.user.username}'s Spotify Profile"
 
-
 class SpotifyWrap(models.Model):
     """
-    Represents a generated Spotify Wrapped session for a user.
+    Represents a user's Spotify Wrap, capturing their music listening data.
+
+    This model stores a snapshot of a user's Spotify listening history,
+    including top tracks, artists, and other music-related insights.
 
     Attributes:
-        user (User): A foreign key relationship to the Django User model.
-        data (JSONField): A JSON field storing the details of the Spotify Wrapped session.
-        top_genre (str): The user's top genre for the session (optional).
-        created_at (datetime): The timestamp when the Spotify Wrapped session was created.
+        user (ForeignKey): Relationship to the Django User who created this Wrap.
+        data (JSONField): Comprehensive JSON data of the Spotify Wrap.
+        top_genre (CharField): Optional field to store the user's top music genre.
+        created_at (DateTimeField): Timestamp of when the Wrap was created.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     data = models.JSONField()
@@ -45,9 +50,9 @@ class SpotifyWrap(models.Model):
 
     def __str__(self):
         """
-        Returns a string representation of the Spotify Wrapped session.
+        String representation of the SpotifyWrap.
 
         Returns:
-            str: The username of the associated user with the suffix 'Spotify Wrap'.
+            str: Username's Spotify Wrap
         """
         return f"{self.user.username}'s Spotify Wrap"
